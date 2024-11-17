@@ -3,6 +3,9 @@ import random
 from helpers import Helper
 from player import Player
 
+# TO DO: NEED TO MAKE SURE YOU START ON GRASS
+# ALSO MAKE SURE TERRAIN MOVES SO THAT EACH STEP EXACRTLY ONTO SAME SPOT IN A BLOCK
+
 #has diff sections - road, grass, water
 #increase difficulty over time
 
