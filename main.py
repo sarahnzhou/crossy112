@@ -1,27 +1,21 @@
 #initialize app cmu graphics stuff
 #handle game flow of switching btwn gameplay modes
 from cmu_graphics import *
+from player import Player
 
 def onAppStart(app):
-    app.userURL = 'scottie.png'
-    app.userX = app.width/2-65 #start position
-    app.userY = app.height - 100 #start position
+    app.player = Player(x=app.width / 2 - 65, y=app.height - 100, imageLink='scottie.png', moveSound=Sound('dogbark.mp3'))
+
+#def onStep(app):
+    
 
 def onKeyPress(app, key):
-    # need to modify these so object moves at an angle
-    # need to make left and right borders -> dog cant go offscreen
-    if key == 'left':
-        app.userX-=25
-    if key == 'right':
-        app.userX+=25
-    if key == 'up':
-        app.userY-=25
-    if key == 'down':
-        app.userY+=25
+    if key in {'left', 'right', 'up', 'down'}:
+        app.player.move(key, app.width, app.height)
 
 def redrawAll(app):
     #draw user
-    drawImage(app.userURL, app.userX, app.userY, width = 110, height = 90)
+    app.player.draw()
 
 def main():
     runApp(width=800, height=800)

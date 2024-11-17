@@ -4,4 +4,4 @@ import random
 
 def randomPosition(): 
     rangeMin, rangeMax = 0, 800 #edges of screen
-    pos = random.randRange(rangeMin, rangeMax)
+    return random.randInt(rangeMin, rangeMax)
