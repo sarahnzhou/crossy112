@@ -15,13 +15,13 @@ class Player:
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
             self.x-=self.stepSize
             self.moveSound.play(restart=False)
-        if direction == 'right' and self.x + 25 + self.width <= canvasWidth: # make sure no going off canvas
+        if direction == 'right' and self.x + 25 + self.width <= canvasWidth: 
             self.x+=self.stepSize
             self.moveSound.play(restart=False)
-        if direction == 'up' and self.y - 25 >= 0: # make sure no going off canvas
+        if direction == 'up' and self.y - 25 >= 0: 
             self.y-=self.stepSize
             self.moveSound.play(restart=False)
-        if direction == 'down' and self.y + 25 + self.height <= canvasHeight: # make sure no going off canvas
+        if direction == 'down' and self.y + 25 + self.height <= canvasHeight: 
             self.y+=self.stepSize
             self.moveSound.play(restart=False)
 

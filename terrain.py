@@ -48,15 +48,17 @@ class randomGenerateTerrain:
         #needs to have player position y
         self.terrainBlocks = []
         self.terrainStarted = False
-        self.terrainMoveSpeed = 1 # start at 3, later when difficulty component added then change it to a slowly increasing terrainMoveSpeed
+        self.baseTerrainMoveSpeed = 0.8
+        self.terrainMoveSpeed = self.baseTerrainMoveSpeed # start at 0.8, later when difficulty component added then change it to a slowly increasing terrainMoveSpeed
 
         self.generateInitialTerrain()
 
     #track which block the player is on so it can keep player on it
     def getPlayerBlock(self):
         for block in self.terrainBlocks:
-            if block.sectY <= self.playerInfo.y < block.sectY + self.blockHeight:
+            if isinstance(block, TerrainSection) and block.sectY <= self.playerInfo.y < block.sectY + self.blockHeight:
                 return block
+        return None
 
     def generateInitialTerrain(self):
         numBlocks = self.screenHeight // self.blockHeight 
@@ -69,13 +71,43 @@ class randomGenerateTerrain:
         if not self.terrainStarted:
             return 
         
+        targetY = self.screenHeight // 2 #area to keep player in - roughly middle
+        veryTopY = self.blockHeight # keep area out of this area - speed up more when it is
+
         currBlock = self.getPlayerBlock()
+
+        if not currBlock: # if not centered on a block find 'closest' block / aka block itself but right
+            nearestBlock = None
+            smallestDistance =  800  # start with biggest distance
+            for block in self.terrainBlocks:
+                distance = abs(block.sectY - self.playerInfo.y)
+                if distance < smallestDistance:
+                    smallestDistance = distance
+                    nearestBlock = block
+            currBlock = nearestBlock
+
+        # if currBlock:
+        #     self.playerInfo.y += self.terrainMoveSpeed
+
+        # make sure centered once certain area reached
+        if self.playerInfo.y <= veryTopY:
+            distanceFromVeryTop = veryTopY - self.playerInfo.y
+            self.terrainMoveSpeed = self.baseTerrainMoveSpeed + distanceFromVeryTop * 0.5
+        elif self.playerInfo.y <= targetY:
+            distanceFromTarget = targetY - self.playerInfo.y
+            self.terrainMoveSpeed = self.baseTerrainMoveSpeed + distanceFromTarget * 0.3
+        else: 
+            self.terrainMoveSpeed = self.baseTerrainMoveSpeed
+
+        #cap speed
+        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 5)
 
         for block in self.terrainBlocks:
             block.sectY += self.terrainMoveSpeed
+        
+        # move player w curr block
+        self.playerInfo.y = currBlock.sectY + (self.blockHeight // 2) - (self.playerInfo.height // 2)
 
-        if currBlock:
-            self.playerInfo.y += self.terrainMoveSpeed
         #remove blocks that are past
         self.terrainBlocks = [block for block in self.terrainBlocks if block.sectY < self.screenHeight]
 
@@ -93,7 +125,7 @@ class randomGenerateTerrain:
         #check if player moved to bottom and will be scrolled past
         #need to fix logic
         for block in self.terrainBlocks:
-            if bottomBlock and self.playerInfo.y + self.playerInfo.height > bottomBlock.sectY:
+            if bottomBlock and self.playerInfo.y + self.playerInfo.height > bottomBlock.sectY + self.blockHeight:
                 Helper.printGameOver(app)
 
     def drawTerrain(self):
