@@ -45,8 +45,8 @@ class randomGenerateTerrain:
         #needs to have player position y
         self.terrainBlocks = []
         self.terrainStarted = False
-        self.baseTerrainMoveSpeed = 0.8
-        self.terrainMoveSpeed = self.baseTerrainMoveSpeed # start at 0.8, later when difficulty component added then change it to a slowly increasing terrainMoveSpeed
+        self.baseTerrainMoveSpeed = 1.2
+        self.terrainMoveSpeed = self.baseTerrainMoveSpeed # start at 1.2, later when difficulty component added then change it to a slowly increasing terrainMoveSpeed
         self.slowDownRate = 0.1 #speed of terrain movement gradually decreases when player doesn't move
         self.generateInitialTerrain()
 
@@ -62,7 +62,6 @@ class randomGenerateTerrain:
             if block.sectY > player.y:
                 return block
         return None
-
 
     def generateInitialTerrain(self):
         numBlocks = self.screenHeight // self.blockHeight 
@@ -88,10 +87,12 @@ class randomGenerateTerrain:
         targetY = self.screenHeight // 2 #area to keep player in - roughly middle
         veryTopY = self.blockHeight # keep area out of this area - speed up more when it is
 
+        speedMultiplier = min(1 + player.playerMoveCount * 0.01, 2)  # max multiplier of 5
+
         currBlock = self.getPlayerBlock(player)
 
-        if not currBlock: # if not centered on a block find 'closest' block / aka block itself but right
-            currBlock = self.findClosestBlock(player)
+        # if not currBlock: # if not centered on a block find 'closest' block / aka block itself but right
+        #     currBlock = self.findClosestBlock(player)
 
         # align position to terrain blocks so it moves together
         if currBlock:
@@ -101,18 +102,22 @@ class randomGenerateTerrain:
             if nextBlock:
                 player.y = nextBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
 
-        # make sure centered once certain area reached
-        if player.y <= veryTopY:
-            distanceFromVeryTop = veryTopY - player.y
-            self.terrainMoveSpeed = self.baseTerrainMoveSpeed + distanceFromVeryTop * 0.5
-        elif player.y <= targetY:
+        #make sure centered once certain area reached
+        #make sure moving fast enough so ideally top not reached
+        if player.y < veryTopY + self.blockHeight:
+            distanceFromVeryTop = max(veryTopY - player.y, 1)
+            self.terrainMoveSpeed += self.terrainMoveSpeed * 0.01 + (1 / distanceFromVeryTop) * speedMultiplier
+        elif player.y < targetY:
             distanceFromTarget = targetY - player.y
-            self.terrainMoveSpeed = self.baseTerrainMoveSpeed + distanceFromTarget * 0.3
+            self.terrainMoveSpeed += self.terrainMoveSpeed * (0.004 + distanceFromTarget/self.screenHeight) * speedMultiplier
         else: 
-            self.terrainMoveSpeed = self.baseTerrainMoveSpeed
+            self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.002 # slow down when below middle
+        
+        if self.terrainMoveSpeed > self.baseTerrainMoveSpeed:
+            self.terrainMoveSpeed += self.terrainMoveSpeed * 0.001
 
         #cap speed
-        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 5)
+        #self.terrainMoveSpeed = min(self.terrainMoveSpeed, 10)
 
         for block in self.terrainBlocks:
             block.sectY += self.terrainMoveSpeed

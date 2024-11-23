@@ -1,4 +1,3 @@
-#initialize app cmu graphics stuff
 #handle game flow of switching btwn gameplay modes
 from cmu_graphics import *
 from player import Player
@@ -18,7 +17,6 @@ def onAppStart(app):
 def onStep(app):
     app.terrain.updateTerrain(app.player)
     
-
 def onKeyPress(app, key):
     app.terrain.terrainStarted = True
     if key in {'left', 'right', 'up', 'down'}:
