@@ -13,10 +13,10 @@ def onAppStart(app):
 
     app.gameOver = False
     app.player = Player(x, y, imageLink, moveSound)
-    app.terrain = randomGenerateTerrain(app.height, app.width, 100, app.player) #100 is block height, 5 is terrainmovespeed
+    app.terrain = randomGenerateTerrain(app.height, app.width, 100) #100 is block height, 5 is terrainmovespeed
 
 def onStep(app):
-    app.terrain.updateTerrain()
+    app.terrain.updateTerrain(app.player)
     
 
 def onKeyPress(app, key):
