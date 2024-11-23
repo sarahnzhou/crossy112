@@ -2,16 +2,19 @@ from cmu_graphics import *
 import random
 from helpers import Helper
 from player import Player
+from movingobjects import Obstacle
 
-# TO DO: NEED TO MAKE SURE YOU START ON GRASS
+# TO DO: 
 #has diff sections - road, grass, water
 #increase difficulty over time
 
-obsTypes = {'road': 'cars', 'grass': ['trees', 'lectureHall'], 'water': ['logs', 'lilypads'], 'tracks': 'train'} #self.sectType to a certain obstacle
+obsTypes = {'road': 'car', 'grass': 'tree', 'water': 'boat', 'tracks': 'train'}
+#obsTypes = {'road': 'car', 'grass': ['tree', 'lectureHall'], 'water': ['boat', 'lilypads'], 'tracks': 'train'} #self.sectType to a certain obstacle
 #can make it cmu themed like 61d bus lol
 terrainColors = {'road': 'silver', 'grass': 'darkSeaGreen', 'water': 'skyBlue', 'tracks': 'dimGray'}
 #need to: alternate grass colors, maybe lines between roads, maybe alternate water colors
 #maybe use image for tracks
+#need to make some types more frequent
 
 class TerrainSection:
     def __init__(self, sectType, sectY, blockHeight, screenWidth):
@@ -20,28 +23,34 @@ class TerrainSection:
         self.blockHeight = blockHeight
         self.screenWidth = screenWidth
         #self.difficulty = #do later - has to do w/ # obstacles
-        #self.obstacles = []
+        self.obstacles = []
+
+    def makeObstacles(self):
+        #for _ in range(self.difficulty):
+        obsCount = random.randint(1, 5)
+        for _ in range(obsCount): #later associate self.difficulty with obsCount
+            typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
+            #NEED TO MAKE SPEED OF OBJECT RANDOM POS/NEG SO CAN GO IN 2 DIRECS
+            self.obstacles.append(Obstacle(typeO, Helper.randomPosition(), Helper.randomPosition(), self.obsImages))
 
     def drawBlock(self):
-        drawRect(0, self.sectY, self.screenWidth, self.blockHeight, fill = terrainColors[self.sectType])
+        drawRect(0, self.sectY, self.screenWidth, self.blockHeight+1, fill = terrainColors[self.sectType])
+        self.drawObstacles()
 
-    # def makeObstacles(self):
-    #     for _ in range(self.difficulty):
-    #         self.obstacles.append(Obstacle(type = obsType[self.sectType], x = randomPosition(), y = randomPosition()))
+    def drawObstacles(self):
+        for obs in self.obstacles:
+            obs.draw()
 
-    # def drawObstacles(self):
-    #     for obs in self.obstacles:
-    #         #draw
-
-    # def moveObstacles(self, speed):
-    #     for obs in self.obstacles:
-    #         obs.move(speed) #write a move thing to update coordinates
+    def moveObstacles(self):
+        for obs in self.obstacles:
+            obs.move()
 
 class randomGenerateTerrain:
-    def __init__(self, screenHeight, screenWidth, blockHeight):
+    def __init__(self, screenHeight, screenWidth, obsImages):
         self.screenHeight = screenHeight
         self.screenWidth = screenWidth
-        self.blockHeight = blockHeight
+        self.obsImages = obsImages
+        self.blockHeight = 100
         #needs to have player position y
         self.terrainBlocks = []
         self.terrainStarted = False
@@ -64,10 +73,13 @@ class randomGenerateTerrain:
         return None
 
     def generateInitialTerrain(self):
-        numBlocks = self.screenHeight // self.blockHeight 
+        numBlocks = self.screenHeight // self.blockHeight
         for i in range(numBlocks):
-            terrType = random.choice(['road', 'grass', 'water', 'tracks'])
-            sectY = self.screenHeight - (i+1)*self.blockHeight
+            if i == 0: #ensure always start on grass
+                terrType = 'grass'
+            else:
+                terrType = random.choice(['road', 'grass', 'water', 'tracks'])
+            sectY = self.screenHeight - (i+1)*self.blockHeight 
             self.terrainBlocks.append(TerrainSection(terrType, sectY, self.blockHeight, self.screenWidth))
             
     def findClosestBlock(self, player):
@@ -104,7 +116,6 @@ class randomGenerateTerrain:
             if nextBlock:
                 player.y = nextBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
 
-        #make sure centered once certain area reached
         #make sure moving fast enough so ideally top not reached
         if player.y < veryTopY + self.blockHeight:
             distanceFromVeryTop = max(veryTopY - player.y, 1)
@@ -121,6 +132,7 @@ class randomGenerateTerrain:
 
         for block in self.terrainBlocks:
             block.sectY += self.terrainMoveSpeed
+            block.moveObstacles()
         
         # move player w curr block
         player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
@@ -134,19 +146,23 @@ class randomGenerateTerrain:
             newBlock = TerrainSection(terrType, -self.blockHeight, self.blockHeight, self.screenWidth)
             self.terrainBlocks.append(newBlock)
 
+        self.alignTerrainBlocks()
+
         bottomBlock = self.terrainBlocks[0]
         for block in self.terrainBlocks:
             if block.sectY > bottomBlock.sectY:
                 bottomBlock = block
 
-        #check if player moved to bottom and will be scrolled past
-        #need to fix logic
-        for block in self.terrainBlocks:
-            if bottomBlock and player.y + player.height > bottomBlock.sectY + self.blockHeight:
-                Helper.printGameOver(app)
+        # check if player at bottom if so game over        
+        if player.y + player.height > self.screenHeight:
+            Helper.printGameOver(app)
+            self.terrainStarted = False  # Stop further terrain updates
+    
+    # make sure terrain blocks have no gaps
+    def alignTerrainBlocks(self):
+        for i in range(1, len(self.terrainBlocks)):
+            self.terrainBlocks[i].sectY = self.terrainBlocks[i - 1].sectY - self.blockHeight
 
     def drawTerrain(self):
         for block in self.terrainBlocks:
             block.drawBlock()
-
-        

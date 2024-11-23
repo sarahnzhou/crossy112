@@ -10,7 +10,7 @@ import random
 class Helper:
     def randomPosition(): 
         rangeMin, rangeMax = 0, 800 #edges of screen
-        return random.randInt(rangeMin, rangeMax)
+        return random.randint(rangeMin, rangeMax)
 
     def printGameOver(app):
         app.gameOver = True

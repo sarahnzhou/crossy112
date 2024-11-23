@@ -7,12 +7,24 @@ from helpers import Helper
 def onAppStart(app):
     x = app.width / 2 - 65
     y = app.height - 100
-    imageLink='scottie.png'
+    dogLink='scottie.png'
     moveSound=Sound('dogbark.mp3')
 
+    redCarLink = 'redcar.png'
+    tree1Link = 'tree.png'
+    boatLink = 'boat.png'
+    trainLink = 'train.png'
+
+    app.obsImages = {
+        'car': redCarLink,
+        'tree': tree1Link,
+        'boat': boatLink,
+        'train': trainLink
+    }
+
     app.gameOver = False
-    app.player = Player(x, y, imageLink, moveSound)
-    app.terrain = randomGenerateTerrain(app.height, app.width, 100) #100 is block height, 5 is terrainmovespeed
+    app.player = Player(x, y, dogLink, moveSound)
+    app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages) #100 is block height, 5 is terrainmovespeed
 
 def onStep(app):
     app.terrain.updateTerrain(app.player)
