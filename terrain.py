@@ -56,9 +56,16 @@ class randomGenerateTerrain:
     #track which block the player is on so it can keep player on it
     def getPlayerBlock(self):
         for block in self.terrainBlocks:
-            if isinstance(block, TerrainSection) and block.sectY <= self.playerInfo.y < block.sectY + self.blockHeight:
+            if block.sectY <= self.playerInfo.y < block.sectY + self.blockHeight:
                 return block
         return None
+    
+    def findNextBlock(self):
+        for block in self.terrainBlocks:
+            if block.sectY > self.playerInfo.y:
+                return block
+        return None
+
 
     def generateInitialTerrain(self):
         numBlocks = self.screenHeight // self.blockHeight 
@@ -67,6 +74,16 @@ class randomGenerateTerrain:
             sectY = self.screenHeight - (i+1)*self.blockHeight
             self.terrainBlocks.append(TerrainSection(terrType, sectY, self.blockHeight, self.screenWidth))
             
+    def findClosestBlock(self):
+        closest = None
+        smallestDistance =  float('inf')  # start with biggest distance
+        for block in self.terrainBlocks:
+            distance = abs(block.sectY - self.playerInfo.y)
+            if distance < smallestDistance:
+                smallestDistance = distance
+                closest = block
+        return closest
+    
     def updateTerrain(self):
         if not self.terrainStarted:
             return 
@@ -77,17 +94,15 @@ class randomGenerateTerrain:
         currBlock = self.getPlayerBlock()
 
         if not currBlock: # if not centered on a block find 'closest' block / aka block itself but right
-            nearestBlock = None
-            smallestDistance =  800  # start with biggest distance
-            for block in self.terrainBlocks:
-                distance = abs(block.sectY - self.playerInfo.y)
-                if distance < smallestDistance:
-                    smallestDistance = distance
-                    nearestBlock = block
-            currBlock = nearestBlock
+            currBlock = self.findClosestBlock()
 
-        # if currBlock:
-        #     self.playerInfo.y += self.terrainMoveSpeed
+        # align position to terrain blocks so it moves together
+        if currBlock:
+            self.playerInfo.y = currBlock.sectY + (self.blockHeight // 2) - (self.playerInfo.height // 2)
+        else:
+            nextBlock = self.findNextBlock()
+            if nextBlock:
+                self.playerInfo.y = nextBlock.sectY + (self.blockHeight // 2) - (self.playerInfo.height // 2)
 
         # make sure centered once certain area reached
         if self.playerInfo.y <= veryTopY:
@@ -112,14 +127,14 @@ class randomGenerateTerrain:
         self.terrainBlocks = [block for block in self.terrainBlocks if block.sectY < self.screenHeight]
 
         #check if at top
-        if len(self.terrainBlocks) == 0 or self.terrainBlocks[-1].sectY >= self.blockHeight:
+        while len(self.terrainBlocks) == 0 or self.terrainBlocks[-1].sectY >= 0:
             terrType = random.choice(['road', 'grass', 'water', 'tracks'])
             newBlock = TerrainSection(terrType, -self.blockHeight, self.blockHeight, self.screenWidth)
             self.terrainBlocks.append(newBlock)
 
-        bottomBlock = None
+        bottomBlock = self.terrainBlocks[0]
         for block in self.terrainBlocks:
-            if bottomBlock is None or block.sectY > bottomBlock.sectY:
+            if block.sectY > bottomBlock.sectY:
                 bottomBlock = block
 
         #check if player moved to bottom and will be scrolled past
