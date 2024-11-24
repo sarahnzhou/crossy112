@@ -3,6 +3,7 @@ from cmu_graphics import *
 from player import Player
 from terrain import randomGenerateTerrain
 from helpers import Helper
+from movingobjects import Obstacle
 
 def onAppStart(app):
     x = app.width / 2 - 65
@@ -15,12 +16,7 @@ def onAppStart(app):
     boatLink = 'boat.png'
     trainLink = 'train.png'
 
-    app.obsImages = {
-        'car': redCarLink,
-        'tree': tree1Link,
-        'boat': boatLink,
-        'train': trainLink
-    }
+    app.obsImages = {'car': redCarLink, 'tree': tree1Link, 'boat': boatLink, 'train': trainLink}
 
     app.gameOver = False
     app.player = Player(x, y, dogLink, moveSound)
@@ -39,6 +35,7 @@ def redrawAll(app):
     app.terrain.drawTerrain()
     app.player.draw()
 
+    #drawImage(app.obsImages['car'], 100, 100)
     if app.gameOver:
         drawLabel('Game Over', app.width/2, app.height/2, size=50, bold=True, fill='red', align='center')
 

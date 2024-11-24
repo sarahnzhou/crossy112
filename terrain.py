@@ -8,7 +8,7 @@ from movingobjects import Obstacle
 #has diff sections - road, grass, water
 #increase difficulty over time
 
-obsTypes = {'road': 'car', 'grass': 'tree', 'water': 'boat', 'tracks': 'train'}
+obsTypes = {'road': ['car'], 'grass': ['tree'], 'water': ['boat'], 'tracks': ['train']}
 #obsTypes = {'road': 'car', 'grass': ['tree', 'lectureHall'], 'water': ['boat', 'lilypads'], 'tracks': 'train'} #self.sectType to a certain obstacle
 #can make it cmu themed like 61d bus lol
 terrainColors = {'road': 'silver', 'grass': 'darkSeaGreen', 'water': 'skyBlue', 'tracks': 'dimGray'}
@@ -17,23 +17,29 @@ terrainColors = {'road': 'silver', 'grass': 'darkSeaGreen', 'water': 'skyBlue', 
 #need to make some types more frequent
 
 class TerrainSection:
-    def __init__(self, sectType, sectY, blockHeight, screenWidth):
+    def __init__(self, sectType, sectY, blockHeight, screenWidth, obsImages, terrainMoveSpeed):
         self.sectType = sectType
         self.sectY = sectY #y coords of where it is
         self.blockHeight = blockHeight
         self.screenWidth = screenWidth
+        self.obsImages = obsImages
         #self.difficulty = #do later - has to do w/ # obstacles
         self.obstacles = []
+        self.makeObstacles()
+        self.terrainMoveSpeed = terrainMoveSpeed
 
     def makeObstacles(self):
         #for _ in range(self.difficulty):
         obsCount = random.randint(1, 5)
         for _ in range(obsCount): #later associate self.difficulty with obsCount
+            #print(obsTypes)
             typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
             #NEED TO MAKE SPEED OF OBJECT RANDOM POS/NEG SO CAN GO IN 2 DIRECS
-            self.obstacles.append(Obstacle(typeO, Helper.randomPosition(), Helper.randomPosition(), self.obsImages))
+            x = Helper.randomPosition()
+            self.obstacles.append(Obstacle(typeO, x, self.sectY, self.obsImages))
 
     def drawBlock(self):
+        #drawImage(self.obsImages['car'], 300, 300)
         drawRect(0, self.sectY, self.screenWidth, self.blockHeight+1, fill = terrainColors[self.sectType])
         self.drawObstacles()
 
@@ -43,7 +49,7 @@ class TerrainSection:
 
     def moveObstacles(self):
         for obs in self.obstacles:
-            obs.move()
+            obs.move(self.terrainMoveSpeed)
 
 class randomGenerateTerrain:
     def __init__(self, screenHeight, screenWidth, obsImages):
@@ -80,7 +86,7 @@ class randomGenerateTerrain:
             else:
                 terrType = random.choice(['road', 'grass', 'water', 'tracks'])
             sectY = self.screenHeight - (i+1)*self.blockHeight 
-            self.terrainBlocks.append(TerrainSection(terrType, sectY, self.blockHeight, self.screenWidth))
+            self.terrainBlocks.append(TerrainSection(terrType, sectY, self.blockHeight, self.screenWidth, self.obsImages, self.terrainMoveSpeed))
             
     def findClosestBlock(self, player):
         closest = None
@@ -143,7 +149,7 @@ class randomGenerateTerrain:
         #check if at top
         while len(self.terrainBlocks) == 0 or self.terrainBlocks[-1].sectY >= 0:
             terrType = random.choice(['road', 'grass', 'water', 'tracks'])
-            newBlock = TerrainSection(terrType, -self.blockHeight, self.blockHeight, self.screenWidth)
+            newBlock = TerrainSection(terrType, -self.blockHeight, self.blockHeight, self.screenWidth, self.obsImages, self.terrainMoveSpeed)
             self.terrainBlocks.append(newBlock)
 
         self.alignTerrainBlocks()
