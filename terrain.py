@@ -25,18 +25,28 @@ class TerrainSection:
         self.obsImages = obsImages
         #self.difficulty = #do later - has to do w/ # obstacles
         self.obstacles = []
-        self.makeObstacles()
         self.terrainMoveSpeed = terrainMoveSpeed
+        self.direction = random.choice([-1, 1]) #can move left or right
+        self.makeObstacles()
 
     def makeObstacles(self):
         #for _ in range(self.difficulty):
-        obsCount = random.randint(1, 5)
+        obsCount = random.randint(1, 3)
         for _ in range(obsCount): #later associate self.difficulty with obsCount
             #print(obsTypes)
             typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
-            #NEED TO MAKE SPEED OF OBJECT RANDOM POS/NEG SO CAN GO IN 2 DIRECS
+            y = self.sectY
+            x = self.getNoOverlapX()
+            self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction))
+
+    def getNoOverlapX(self):
+        for _ in range(100):
             x = Helper.randomPosition()
-            self.obstacles.append(Obstacle(typeO, x, self.sectY, self.obsImages))
+            if not any(self.isOverlapping(x, obs.obstacleX) for obs in self.obstacles):
+                return x
+
+    def isOverlapping(self, x1, x2):
+        return abs(x1 - x2) < 100 # 100 is object width
 
     def drawBlock(self):
         #drawImage(self.obsImages['car'], 300, 300)
@@ -50,6 +60,7 @@ class TerrainSection:
     def moveObstacles(self):
         for obs in self.obstacles:
             obs.move(self.terrainMoveSpeed)
+            obs.obstacleY= self.sectY
 
 class randomGenerateTerrain:
     def __init__(self, screenHeight, screenWidth, obsImages):
