@@ -30,6 +30,8 @@ class TerrainSection:
         self.makeObstacles()
 
     def makeObstacles(self):
+        playerStartingX = 335
+        playerStartingY = 700
         #for _ in range(self.difficulty):
         obsCount = random.randint(1, 3)
         for _ in range(obsCount): #later associate self.difficulty with obsCount
@@ -37,6 +39,8 @@ class TerrainSection:
             typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
             y = self.sectY
             x = self.getNoOverlapX()
+            if typeO == 'tree' and (playerStartingX - 100 <= x <= playerStartingX + 100 and playerStartingY - 50 <= y <= playerStartingY + 50):
+                continue
             self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction))
 
     def getNoOverlapX(self):
@@ -76,6 +80,10 @@ class randomGenerateTerrain:
         self.slowDownRate = 0.1 #speed of terrain movement gradually decreases when player doesn't move
         self.generateInitialTerrain()
 
+    def updateObstacles(self):
+        for block in self.terrainBlocks:
+            block.moveObstacles()
+
     #track which block the player is on so it can keep player on it
     def getPlayerBlock(self, player):
         for block in self.terrainBlocks:
@@ -111,8 +119,11 @@ class randomGenerateTerrain:
     
     def updateTerrain(self, player):
         if not self.terrainStarted:
+            #self.terrainStarted = True
             return 
         
+        player.onBoat = False
+
         targetY = self.screenHeight // 2 #area to keep player in - roughly middle
         veryTopY = self.blockHeight # keep area out of this area - speed up more when it is
 
@@ -148,8 +159,21 @@ class randomGenerateTerrain:
         self.terrainMoveSpeed = min(self.terrainMoveSpeed, 20)
 
         for block in self.terrainBlocks:
-            block.sectY += self.terrainMoveSpeed
             block.moveObstacles()
+            for obs in block.obstacles:
+                if obs.collision(player):
+                    if obs.obstacleType in ['car', 'train']:
+                        self.terrainStarted = False
+                        app.gameOver = True
+                        return
+                    elif obs.obstacleType == 'boat':
+                        player.updateBoat(obs)        
+        block.sectY += self.terrainMoveSpeed
+
+        playerBlock = self.getPlayerBlock(player)
+        if playerBlock and playerBlock.sectType == 'water' and not player.onBoat:
+            self.terrainStarted = False
+            app.gameOver = True        
         
         # move player w curr block
         player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)

@@ -21,14 +21,19 @@ def onAppStart(app):
     app.gameOver = False
     app.player = Player(x, y, dogLink, moveSound)
     app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages) #100 is block height, 5 is terrainmovespeed
+    #app.terrain.terrainStarted = True
 
 def onStep(app):
-    app.terrain.updateTerrain(app.player)
+    #app.terrain.updateTerrain(app.player)
+    app.terrain.updateObstacles()
+    if app.terrain.terrainStarted:
+        app.terrain.updateTerrain(app.player)
     
 def onKeyPress(app, key):
-    app.terrain.terrainStarted = True
     if key in {'left', 'right', 'up', 'down'}:
-        app.player.move(key, app.width, app.height)
+        app.terrain.terrainStarted = True
+        app.player.move(key, app.width, app.height, app.terrain)
+        #print(f"Key pressed: {key}")
 
 def redrawAll(app):
     #draw user

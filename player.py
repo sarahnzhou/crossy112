@@ -13,8 +13,9 @@ class Player:
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
         self.hasMoved = False
+        self.onBoat = False
 
-    def move(self, direction, canvasWidth, canvasHeight):
+    def move(self, direction, canvasWidth, canvasHeight, terrain):
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
             self.x-=self.stepSize
@@ -28,11 +29,27 @@ class Player:
         if direction == 'down' and self.y + 25 + self.height <= canvasHeight: 
             self.y+=self.stepSize
             moved = True
+
+        block = terrain.getPlayerBlock(self)
+        if block:
+            for obs in block.obstacles:
+                if obs.obstacleType == 'tree' and obs.collision(self):
+                    #self - Player(self.x, self.y, self.imageLink, self.moveSound)
+                    return  #just make sure no moving
         
         if moved:
+            #print(f"Moving {direction}. New position: ({self.x}, {self.y})")
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True
+    
+    def updateBoat(self, boat):
+        if boat and boat.collision(self):
+            if boat.direction > 0:
+                self.x += boat.speed #* boat.direction 
+                self.onBoat=True
+        else:
+            self.onBoat = False
 
     # def decaySpeed(self):
     #     if self.playerMoveCount > 0 and not self.hasMoved:
