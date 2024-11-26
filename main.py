@@ -21,11 +21,17 @@ def onAppStart(app):
     app.gameOver = False
     app.player = Player(x, y, dogLink, moveSound)
     app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages) #100 is block height, 5 is terrainmovespeed
+    #app.terrain.updateObstacles()
     #app.terrain.terrainStarted = True
 
 def onStep(app):
-    #app.terrain.updateTerrain(app.player)
     app.terrain.updateObstacles()
+
+    screenMiddle = app.height / 2
+    if not app.terrain.terrainStarted and app.player.y <= screenMiddle:
+        app.terrain.terrainStarted = True
+
+    # if not app.gameOver:
     if app.terrain.terrainStarted:
         app.terrain.updateTerrain(app.player)
     
@@ -42,6 +48,7 @@ def redrawAll(app):
 
     #drawImage(app.obsImages['car'], 100, 100)
     if app.gameOver:
+        drawRect(0, 0, app.width, app.height, fill='black') 
         drawLabel('Game Over', app.width/2, app.height/2, size=50, bold=True, fill='red', align='center')
 
 def main():

@@ -7,7 +7,6 @@ obsTypes = {'road': 'car', 'grass': 'tree', 'water': 'boat', 'tracks': 'train'}
 # move player w/boat
 # must go around trees
 
-
 class Obstacle:
     def __init__(self, obstacleType, obstacleX, obstacleY, images, direction):
         self.obstacleType = obstacleType
@@ -24,7 +23,6 @@ class Obstacle:
             drawImage(self.images[self.obstacleType], self.obstacleX, self.obstacleY, width = self.width, height = self.height)
 
     def collision(self, player):
-
         return (self.obstacleX < player.x + player.width and self.obstacleX + self.width > player.x and self.obstacleY < player.y + player.height and self.obstacleY + self.height > player.y)
 
     def move(self, terrainSpeed):

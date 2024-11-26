@@ -119,7 +119,6 @@ class randomGenerateTerrain:
     
     def updateTerrain(self, player):
         if not self.terrainStarted:
-            #self.terrainStarted = True
             return 
         
         player.onBoat = False
@@ -159,6 +158,8 @@ class randomGenerateTerrain:
         self.terrainMoveSpeed = min(self.terrainMoveSpeed, 20)
 
         for block in self.terrainBlocks:
+            if self.terrainStarted:
+                block.sectY += self.terrainMoveSpeed
             block.moveObstacles()
             for obs in block.obstacles:
                 if obs.collision(player):
@@ -168,12 +169,12 @@ class randomGenerateTerrain:
                         return
                     elif obs.obstacleType == 'boat':
                         player.updateBoat(obs)        
-        block.sectY += self.terrainMoveSpeed
 
         playerBlock = self.getPlayerBlock(player)
         if playerBlock and playerBlock.sectType == 'water' and not player.onBoat:
             self.terrainStarted = False
-            app.gameOver = True        
+            app.gameOver = True       
+            return 
         
         # move player w curr block
         player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)

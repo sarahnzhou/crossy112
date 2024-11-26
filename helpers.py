@@ -14,3 +14,5 @@ class Helper:
 
     def printGameOver(app):
         app.gameOver = True
+        #app.terrain = None
+        #app.player = None

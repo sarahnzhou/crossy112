@@ -16,27 +16,29 @@ class Player:
         self.onBoat = False
 
     def move(self, direction, canvasWidth, canvasHeight, terrain):
+        newX, newY = self.x, self.y
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
-            self.x-=self.stepSize
+            newX-=self.stepSize
             moved = True
         if direction == 'right' and self.x + 25 + self.width <= canvasWidth: 
-            self.x+=self.stepSize
+            newX+=self.stepSize
             moved = True
         if direction == 'up' and self.y - 25 >= 0: 
-            self.y-=self.stepSize
+            newY-=self.stepSize
             moved = True
         if direction == 'down' and self.y + 25 + self.height <= canvasHeight: 
-            self.y+=self.stepSize
+            newY+=self.stepSize
             moved = True
 
         block = terrain.getPlayerBlock(self)
         if block:
             for obs in block.obstacles:
-                if obs.obstacleType == 'tree' and obs.collision(self):
-                    #self - Player(self.x, self.y, self.imageLink, self.moveSound)
+                if obs.obstacleType == 'tree' and obs.collision(Player(newX, newY, self.imageLink, self.moveSound)):
+                    newX, newY = self.x, self.y
+
                     return  #just make sure no moving
-        
+        self.x, self.y = newX, newY
         if moved:
             #print(f"Moving {direction}. New position: ({self.x}, {self.y})")
             self.moveSound.play(restart=False)
@@ -45,9 +47,10 @@ class Player:
     
     def updateBoat(self, boat):
         if boat and boat.collision(self):
-            if boat.direction > 0:
-                self.x += boat.speed #* boat.direction 
-                self.onBoat=True
+            #if boat.direction > 0:
+            self.x += boat.speed * boat.direction #maybe need to do speed * something like what boat starts out on
+            self.onBoat=True
+
         else:
             self.onBoat = False
 
