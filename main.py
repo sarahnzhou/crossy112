@@ -12,7 +12,7 @@ def onAppStart(app):
     moveSound=Sound('dogbark.mp3')
 
     redCarLink = 'redcar.png'
-    tree1Link = 'tree.png'
+    tree1Link = 'blocktree.png'
     boatLink = 'boat.png'
     trainLink = 'train.png'
 

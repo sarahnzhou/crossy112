@@ -8,7 +8,7 @@ class Player:
         self.imageLink = imageLink
         self.moveSound = soundLink
         self.width = 110 #size of image
-        self.height = 90
+        self.height = 100
         self.stepSize = 100
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
