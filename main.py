@@ -7,7 +7,7 @@ from movingobjects import Obstacle
 
 def onAppStart(app):
     x = app.width / 2 - 65
-    y = app.height - 100
+    y = app.height - 300
     dogLink='scottie.png'
     moveSound=Sound('dogbark.mp3')
 
@@ -48,7 +48,7 @@ def redrawAll(app):
 
     #drawImage(app.obsImages['car'], 100, 100)
     if app.gameOver:
-        drawRect(0, 0, app.width, app.height, fill='black') 
+       # drawRect(0, 0, app.width, app.height, fill='black') 
         drawLabel('Game Over', app.width/2, app.height/2, size=50, bold=True, fill='red', align='center')
 
 def main():

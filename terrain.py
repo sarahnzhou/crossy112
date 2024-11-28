@@ -31,26 +31,30 @@ class TerrainSection:
 
     def makeObstacles(self):
         playerStartingX = 335
-        playerStartingY = 700
+        playerStartingY = 500
         #for _ in range(self.difficulty):
         obsCount = random.randint(1, 3)
         for _ in range(obsCount): #later associate self.difficulty with obsCount
             #print(obsTypes)
             typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
             y = self.sectY
-            x = self.getNoOverlapX()
-            if typeO == 'tree' and (playerStartingX - 100 <= x <= playerStartingX + 100 and playerStartingY - 50 <= y <= playerStartingY + 50):
+            xOptions = []
+            for i in range(self.screenWidth // 100):
+                xOptions.append(35+i*100)
+            x = random.choice(xOptions)
+            if typeO == 'tree' and (playerStartingX <= x <= playerStartingX + 100 and playerStartingY - 100<= y <= playerStartingY):
                 continue
             self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction))
 
-    def getNoOverlapX(self):
-        for _ in range(100):
-            x = Helper.randomPosition()
-            if not any(self.isOverlapping(x, obs.obstacleX) for obs in self.obstacles):
-                return x
+    # def getNoOverlapX(self):
+    #     for _ in range(100):
+    #         x = Helper.randomPosition()
+    #         if not any(self.isOverlapping(x, obs.obstacleX) for obs in self.obstacles):
+    #             return x
+    #     return random.choice([i * 100 for i in range(self.screenWidth // 100)]) # just in case all 100 dont work
 
-    def isOverlapping(self, x1, x2):
-        return abs(x1 - x2) < 100 # 100 is object width
+    # def isOverlapping(self, x1, x2):
+    #     return abs(x1 - x2) < 100 # 100 is object width
 
     def drawBlock(self):
         #drawImage(self.obsImages['car'], 300, 300)
@@ -85,11 +89,12 @@ class randomGenerateTerrain:
             block.moveObstacles()
 
     #track which block the player is on so it can keep player on it
-    def getPlayerBlock(self, player):
+    def getPlayerBlock(self, player, intendedY=None):
+        yPos = intendedY if intendedY is not None else player.y
         for block in self.terrainBlocks:
-            if block.sectY <= player.y < block.sectY + self.blockHeight:
+            if block.sectY <= yPos < block.sectY + self.blockHeight:
                 return block
-        return None
+        return self.findClosestBlock(player)
     
     def findNextBlock(self, player):
         for block in self.terrainBlocks:
@@ -98,9 +103,9 @@ class randomGenerateTerrain:
         return None
 
     def generateInitialTerrain(self):
-        numBlocks = self.screenHeight // self.blockHeight
+        numBlocks = self.screenHeight // self.blockHeight 
         for i in range(numBlocks):
-            if i == 0: #ensure always start on grass
+            if i<3: #ensure always start on grass
                 terrType = 'grass'
             else:
                 terrType = random.choice(['road', 'grass', 'water', 'tracks'])
@@ -162,7 +167,7 @@ class randomGenerateTerrain:
                 block.sectY += self.terrainMoveSpeed
             block.moveObstacles()
             for obs in block.obstacles:
-                if obs.collision(player):
+                if player.collision(obs, player.x, player.y):
                     if obs.obstacleType in ['car', 'train']:
                         self.terrainStarted = False
                         app.gameOver = True

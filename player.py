@@ -15,8 +15,17 @@ class Player:
         self.hasMoved = False
         self.onBoat = False
 
+    def collision(self, obstacle, newX, newY):
+        # horizontal = (newX < obstacle.obstacleX + obstacle.width and newX + self.width - 100 > obstacle.obstacleX)
+        # vertical = (newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)
+        # return horizontal and vertical
+        collides = (newX < obstacle.obstacleX + obstacle.width and newX + self.width - 100 > obstacle.obstacleX
+                and newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)    
+        return collides
+    
     def move(self, direction, canvasWidth, canvasHeight, terrain):
         newX, newY = self.x, self.y
+        #collisionMargin = 30
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
             newX-=self.stepSize
@@ -31,13 +40,15 @@ class Player:
             newY+=self.stepSize
             moved = True
 
-        block = terrain.getPlayerBlock(self)
+        block = terrain.getPlayerBlock(self, intendedY = newY)
         if block:
             for obs in block.obstacles:
-                if obs.obstacleType == 'tree' and obs.collision(Player(newX, newY, self.imageLink, self.moveSound)):
-                    newX, newY = self.x, self.y
-
-                    return  #just make sure no moving
+                if obs.obstacleType == 'tree':
+                    if self.collision(obs, newX, newY):
+                        #moved = False
+                        #newX, newY = self.x, self.y
+                        return  #just make sure no moving
+        
         self.x, self.y = newX, newY
         if moved:
             #print(f"Moving {direction}. New position: ({self.x}, {self.y})")
@@ -46,7 +57,7 @@ class Player:
             self.hasMoved = True
     
     def updateBoat(self, boat):
-        if boat and boat.collision(self):
+        if boat and self.collision(boat, self.x, self.y):
             #if boat.direction > 0:
             self.x += boat.speed * boat.direction #maybe need to do speed * something like what boat starts out on
             self.onBoat=True
