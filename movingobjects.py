@@ -15,7 +15,7 @@ class Obstacle:
         self.direction = direction
 
     def draw(self):
-        if self.obstacleType in self.images:
+        if self.obstacleType in self.images: 
             drawImage(self.images[self.obstacleType], self.obstacleX, self.obstacleY, width = self.width, height = self.height)
 
     def move(self, terrainSpeed):

@@ -30,7 +30,6 @@ obsCounts = {
     'boat': random.randint(1, 3)
 }
 
-
 class TerrainSection:
     def __init__(self, sectType, sectY, blockHeight, screenWidth, obsImages, terrainMoveSpeed):
         self.sectType = sectType
@@ -71,10 +70,9 @@ class TerrainSection:
         return random.choice([i * 100 for i in range(self.screenWidth // 100)]) # just in case all 100 dont work
 
     def isOverlapping(self, x1, x2, w1, w2):
-        return abs(x1 - x2) < (w1 + w2) // 2
+        return x1 < x2 + w2 and x2 < x1 + w1
 
     def drawBlock(self):
-        #drawImage(self.obsImages['car'], 300, 300)
         drawRect(0, self.sectY, self.screenWidth, self.blockHeight+1, fill = terrainColors[self.sectType])
         self.drawObstacles()
 
@@ -85,6 +83,8 @@ class TerrainSection:
     def moveObstacles(self):
         for obs in self.obstacles:
             obs.move(self.terrainMoveSpeed)
+            if obs.obstacleType == 'boat':
+                obs.obstacleX += obs.speed * obs.direction
             obs.obstacleY= self.sectY
 
 class randomGenerateTerrain:
@@ -174,31 +174,23 @@ class randomGenerateTerrain:
             self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor) * (distanceFromTarget / self.screenHeight)
         else: 
             if self.terrainMoveSpeed >= 1.8:
-                self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.3 # slow down when below middle
+                self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 # slow down when below middle
         
         #cap speed
-        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 20)
+        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
 
         for block in self.terrainBlocks:
             if self.terrainStarted:
                 block.sectY += self.terrainMoveSpeed
             block.moveObstacles()
-            for obs in block.obstacles:
-                if player.collision(obs, player.x, player.y):
-                    if obs.obstacleType in ['car', 'train']:
-                        print(f"Game Over: Player collided with a {obs.obstacleType}.")
-                        self.terrainStarted = False
-                        app.gameOver = True
-                        return
-                    elif obs.obstacleType == 'boat':
-                        player.updateBoat(obs)        
+            player.handleCollisions(block, self)
 
         playerBlock = self.getPlayerBlock(player)
         if playerBlock:
             if playerBlock.sectY <= player.y < playerBlock.sectY + self.blockHeight:
                 player.y += self.terrainMoveSpeed
             if playerBlock.sectType == 'water' and not player.onBoat:
-                print("Game Over: Player is in water without a boat.")
+                # print("Game Over: Player is in water without a boat.")
                 self.terrainStarted = False
                 app.gameOver = True       
                 return 

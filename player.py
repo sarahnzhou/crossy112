@@ -2,7 +2,6 @@ from cmu_graphics import *
 
 class Player:
     def __init__(self, userX, userY, imageLink, soundLink):
-        #later can add more than 1 character (rn its just dog)
         self.x = userX
         self.y = userY
         self.imageLink = imageLink
@@ -14,6 +13,7 @@ class Player:
         self.speedDecay = 0.1
         self.hasMoved = False
         self.onBoat = False
+        self.boat = None
 
     def collision(self, obstacle, newX, newY):
         marginOfError = 0
@@ -54,13 +54,39 @@ class Player:
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True
-    
-    def updateBoat(self, boat):
-        if boat and self.collision(boat, self.x, self.y):
-            #if boat.direction > 0:
-            self.x += boat.speed * boat.direction #maybe need to do speed * something like what boat starts out on
-            self.onBoat=True
 
+            #boats = [obs for obs in block.obstacles if obs.obstacleType == 'boat']
+            self.updateBoat(obs)
+    
+    def handleCollisions(self, block, terrain):
+        for obs in block.obstacles:
+                if self.collision(obs, self.x, self.y):
+                    if obs.obstacleType in ['car', 'train']:
+                        terrain.terrainStarted = False
+                        app.gameOver = True
+                        return
+                    elif obs.obstacleType == 'boat':
+                        #boats = [obstacle for obstacle in block.obstacles if obstacle.obstacleType == 'boat']
+                        self.updateBoat(obs)        
+
+    def updateBoat(self, boat):
+        # currBoat = None
+        # for boat in boats:
+        #     if self.collision(boat, self.x, self.y):
+        #         currBoat = boat
+        #         break
+        # if currBoat:
+        #     if not self.hasMoved:  
+        #         self.x += currBoat.speed * currBoat.direction
+        #     self.boat = currBoat
+        #     self.onBoat = True
+        # else:
+        #     self.onBoat = False
+        #     self.boat = None
+
+        if boat and self.collision(boat, self.x, self.y):
+            self.x = boat.obstacleX + self.width/2 #maybe need to do speed * something like what boat starts out on
+            self.onBoat=True
         else:
             self.onBoat = False
 
