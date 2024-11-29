@@ -8,7 +8,7 @@ class Player:
         self.imageLink = imageLink
         self.moveSound = soundLink
         self.width = 110 #size of image
-        self.height = 100
+        self.height = 95
         self.stepSize = 100
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
@@ -16,16 +16,18 @@ class Player:
         self.onBoat = False
 
     def collision(self, obstacle, newX, newY):
+        marginOfError = 0
         # horizontal = (newX < obstacle.obstacleX + obstacle.width and newX + self.width - 100 > obstacle.obstacleX)
         # vertical = (newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)
         # return horizontal and vertical
-        collides = (newX < obstacle.obstacleX + obstacle.width and newX + self.width - 100 > obstacle.obstacleX
-                and newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)    
+        collides = (newX + marginOfError < obstacle.obstacleX + obstacle.width - marginOfError and 
+                    newX + self.width - 90 > obstacle.obstacleX + marginOfError and
+                    newY + marginOfError < obstacle.obstacleY + obstacle.height - marginOfError and 
+                    newY + self.height - marginOfError > obstacle.obstacleY + marginOfError)    
         return collides
     
     def move(self, direction, canvasWidth, canvasHeight, terrain):
         newX, newY = self.x, self.y
-        #collisionMargin = 30
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
             newX-=self.stepSize
@@ -45,13 +47,10 @@ class Player:
             for obs in block.obstacles:
                 if obs.obstacleType == 'tree':
                     if self.collision(obs, newX, newY):
-                        #moved = False
-                        #newX, newY = self.x, self.y
                         return  #just make sure no moving
         
-        self.x, self.y = newX, newY
         if moved:
-            #print(f"Moving {direction}. New position: ({self.x}, {self.y})")
+            self.x, self.y = newX, newY
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True

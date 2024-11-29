@@ -4,17 +4,32 @@ from helpers import Helper
 from player import Player
 from movingobjects import Obstacle
 
-# TO DO: 
-#has diff sections - road, grass, water
-#increase difficulty over time
-
-obsTypes = {'road': ['car'], 'grass': ['tree'], 'water': ['boat'], 'tracks': ['train']}
 #obsTypes = {'road': 'car', 'grass': ['tree', 'lectureHall'], 'water': ['boat', 'lilypads'], 'tracks': 'train'} #self.sectType to a certain obstacle
-#can make it cmu themed like 61d bus lol
-terrainColors = {'road': 'silver', 'grass': 'darkSeaGreen', 'water': 'skyBlue', 'tracks': 'dimGray'}
-#need to: alternate grass colors, maybe lines between roads, maybe alternate water colors
-#maybe use image for tracks
-#need to make some types more frequent
+obsTypes = {
+    'road': ['car'], 
+    'grass': ['tree'], 
+    'water': ['boat'], 
+    'tracks': ['train']
+}
+terrainColors = {
+    'road': 'silver', 
+    'grass': 'darkSeaGreen',
+    'water': 'skyBlue', 
+    'tracks': 'dimGray'
+}
+obsSizes = {
+    'car': (120, 100), #width, height
+    'tree': (50, 100),
+    'train': (220, 100),
+    'boat': (250, 100)
+}
+obsCounts = {
+    'car': random.randint(1, 2),
+    'tree': random.randint(1, 5),
+    'train': random.randint(1, 2),
+    'boat': random.randint(1, 3)
+}
+
 
 class TerrainSection:
     def __init__(self, sectType, sectY, blockHeight, screenWidth, obsImages, terrainMoveSpeed):
@@ -32,29 +47,32 @@ class TerrainSection:
     def makeObstacles(self):
         playerStartingX = 335
         playerStartingY = 500
+        count = obsCounts[typeO]
         #for _ in range(self.difficulty):
-        obsCount = random.randint(1, 3)
-        for _ in range(obsCount): #later associate self.difficulty with obsCount
-            #print(obsTypes)
+        for _ in range(count): #later associate self.difficulty with obsCount
             typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
             y = self.sectY
+            width, height = obsSizes[typeO]
+
+            x = self.getNoOverlapX(width)
+ 
+            if typeO == 'tree' and (playerStartingX <= x <= playerStartingX + 100 and playerStartingY - 100<= y <= playerStartingY):
+                continue
+            self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction, width, height))
+
+    def getNoOverlapX(self, width):
+        for _ in range(100):
             xOptions = []
             for i in range(self.screenWidth // 100):
                 xOptions.append(35+i*100)
             x = random.choice(xOptions)
-            if typeO == 'tree' and (playerStartingX <= x <= playerStartingX + 100 and playerStartingY - 100<= y <= playerStartingY):
-                continue
-            self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction))
 
-    # def getNoOverlapX(self):
-    #     for _ in range(100):
-    #         x = Helper.randomPosition()
-    #         if not any(self.isOverlapping(x, obs.obstacleX) for obs in self.obstacles):
-    #             return x
-    #     return random.choice([i * 100 for i in range(self.screenWidth // 100)]) # just in case all 100 dont work
+            if not any(self.isOverlapping(x, obs.obstacleX, width, obs.width) for obs in self.obstacles):
+                return x
+        return random.choice([i * 100 for i in range(self.screenWidth // 100)]) # just in case all 100 dont work
 
-    # def isOverlapping(self, x1, x2):
-    #     return abs(x1 - x2) < 100 # 100 is object width
+    def isOverlapping(self, x1, x2, w1, w2):
+        return abs(x1 - x2) < (w1 + w2) // 2
 
     def drawBlock(self):
         #drawImage(self.obsImages['car'], 300, 300)
@@ -137,16 +155,16 @@ class randomGenerateTerrain:
 
         currBlock = self.getPlayerBlock(player)
 
-        # if not currBlock: # if not centered on a block find 'closest' block / aka block itself but right
-        #     currBlock = self.findClosestBlock(player)
-
         # align position to terrain blocks so it moves together
+        # if currBlock:
+        #     player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
+        # else:
+        #     nextBlock = self.findNextBlock(player)
+        #     if nextBlock:
+        #         player.y = nextBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
         if currBlock:
-            player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
-        else:
-            nextBlock = self.findNextBlock(player)
-            if nextBlock:
-                player.y = nextBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
+            if currBlock.sectY <= player.y < currBlock.sectY + self.blockHeight:
+                player.y += self.terrainMoveSpeed
 
         #make sure moving fast enough so ideally top not reached
         if player.y < veryTopY + self.blockHeight:
@@ -169,6 +187,7 @@ class randomGenerateTerrain:
             for obs in block.obstacles:
                 if player.collision(obs, player.x, player.y):
                     if obs.obstacleType in ['car', 'train']:
+                        print(f"Game Over: Player collided with a {obs.obstacleType}.")
                         self.terrainStarted = False
                         app.gameOver = True
                         return
@@ -176,10 +195,14 @@ class randomGenerateTerrain:
                         player.updateBoat(obs)        
 
         playerBlock = self.getPlayerBlock(player)
-        if playerBlock and playerBlock.sectType == 'water' and not player.onBoat:
-            self.terrainStarted = False
-            app.gameOver = True       
-            return 
+        if playerBlock:
+            if playerBlock.sectY <= player.y < playerBlock.sectY + self.blockHeight:
+                player.y += self.terrainMoveSpeed
+            if playerBlock.sectType == 'water' and not player.onBoat:
+                print("Game Over: Player is in water without a boat.")
+                self.terrainStarted = False
+                app.gameOver = True       
+                return 
         
         # move player w curr block
         player.y = currBlock.sectY + (self.blockHeight // 2) - (player.height // 2)
@@ -202,7 +225,8 @@ class randomGenerateTerrain:
 
         # check if player at bottom if so game over        
         if player.y + player.height > self.screenHeight:
-            Helper.printGameOver(app)
+            app.gameOver = True
+            print('game over - hit bottom')
             self.terrainStarted = False  # Stop further terrain updates
     
     # make sure terrain blocks have no gaps
