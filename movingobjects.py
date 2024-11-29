@@ -24,7 +24,7 @@ class Obstacle:
         elif self.obstacleType == 'tree':
             self.speed = 0  
         elif self.obstacleType == 'boat':
-            self.speed = 2 * self.direction  
+            self.speed = 5 * self.direction  
         elif self.obstacleType == 'train':
             self.speed = 10 * self.direction
 

@@ -26,7 +26,7 @@ obsSizes = {
 obsCounts = {
     'car': random.randint(1, 2),
     'tree': random.randint(1, 5),
-    'train': random.randint(1, 2),
+    'train': 1,
     'boat': random.randint(1, 3)
 }
 
@@ -47,13 +47,12 @@ class TerrainSection:
     def makeObstacles(self):
         playerStartingX = 335
         playerStartingY = 500
+        typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
         count = obsCounts[typeO]
+        width, height = obsSizes[typeO]
         #for _ in range(self.difficulty):
         for _ in range(count): #later associate self.difficulty with obsCount
-            typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
             y = self.sectY
-            width, height = obsSizes[typeO]
-
             x = self.getNoOverlapX(width)
  
             if typeO == 'tree' and (playerStartingX <= x <= playerStartingX + 100 and playerStartingY - 100<= y <= playerStartingY):
