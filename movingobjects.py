@@ -8,6 +8,7 @@ class Obstacle:
         self.obstacleType = obstacleType
         self.obstacleX = obstacleX
         self.obstacleY = obstacleY
+        self.previousX = obstacleX
         self.width = width
         self.height = height
         self.speed = 0
@@ -19,6 +20,7 @@ class Obstacle:
             drawImage(self.images[self.obstacleType], self.obstacleX, self.obstacleY, width = self.width, height = self.height)
 
     def move(self, terrainSpeed):
+        self.previousX = self.obstacleX
         if self.obstacleType == 'car':
             self.speed = 5 * self.direction 
         elif self.obstacleType == 'tree':

@@ -13,7 +13,7 @@ class Player:
         self.speedDecay = 0.1
         self.hasMoved = False
         self.onBoat = False
-        self.boat = None
+        #self.boat = None
 
     def collision(self, obstacle, newX, newY):
         marginOfError = 0
@@ -48,15 +48,14 @@ class Player:
                 if obs.obstacleType == 'tree':
                     if self.collision(obs, newX, newY):
                         return  #just make sure no moving
+                elif obs.obstacleType == 'boat' and self.collision(obs, newX, newY):
+                    self.updateBoat(obs)
         
         if moved:
             self.x, self.y = newX, newY
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True
-
-            #boats = [obs for obs in block.obstacles if obs.obstacleType == 'boat']
-            self.updateBoat(obs)
     
     def handleCollisions(self, block, terrain):
         for obs in block.obstacles:
@@ -66,33 +65,15 @@ class Player:
                         app.gameOver = True
                         return
                     elif obs.obstacleType == 'boat':
-                        #boats = [obstacle for obstacle in block.obstacles if obstacle.obstacleType == 'boat']
                         self.updateBoat(obs)        
 
     def updateBoat(self, boat):
-        # currBoat = None
-        # for boat in boats:
-        #     if self.collision(boat, self.x, self.y):
-        #         currBoat = boat
-        #         break
-        # if currBoat:
-        #     if not self.hasMoved:  
-        #         self.x += currBoat.speed * currBoat.direction
-        #     self.boat = currBoat
-        #     self.onBoat = True
-        # else:
-        #     self.onBoat = False
-        #     self.boat = None
-
         if boat and self.collision(boat, self.x, self.y):
-            self.x = boat.obstacleX + self.width/2 #maybe need to do speed * something like what boat starts out on
+            #self.x += boat.speed * boat.direction
+            self.x = boat.obstacleX
             self.onBoat=True
         else:
             self.onBoat = False
-
-    # def decaySpeed(self):
-    #     if self.playerMoveCount > 0 and not self.hasMoved:
-    #         self.playerMoveCount -= self.speedDecayRate
 
     def draw(self):
         drawImage(self.imageLink, self.x, self.y, width = self.width, height = self.height)

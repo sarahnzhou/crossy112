@@ -18,7 +18,7 @@ terrainColors = {
     'tracks': 'dimGray'
 }
 obsSizes = {
-    'car': (120, 100), #width, height
+    'car': (80, 100), #width, height
     'tree': (50, 100),
     'train': (220, 100),
     'boat': (250, 100)
@@ -83,8 +83,8 @@ class TerrainSection:
     def moveObstacles(self):
         for obs in self.obstacles:
             obs.move(self.terrainMoveSpeed)
-            if obs.obstacleType == 'boat':
-                obs.obstacleX += obs.speed * obs.direction
+            # if obs.obstacleType == 'boat':
+            #     obs.obstacleX += obs.speed * obs.direction
             obs.obstacleY= self.sectY
 
 class randomGenerateTerrain:
@@ -177,7 +177,7 @@ class randomGenerateTerrain:
                 self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 # slow down when below middle
         
         #cap speed
-        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
+        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 7)
 
         for block in self.terrainBlocks:
             if self.terrainStarted:
