@@ -62,6 +62,7 @@ class Player:
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True
+            return True
     
     def handleCollisions(self, block, terrain):
         for obs in block.obstacles:

@@ -31,10 +31,7 @@ class Obstacle:
         elif self.obstacleType == 'train':
             self.speed = 10 * self.direction
 
-        if self.speed != 0:
-            # if self.obstacleType == 'boat':
-            #     self.obstacleX -= (self.speed)
-            # else:
+        if self.speed != 0: 
             self.totalDiff = (self.speed - terrainSpeed)
             self.obstacleX -= self.totalDiff
             if self.obstacleX > 800:

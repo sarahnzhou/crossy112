@@ -42,11 +42,13 @@ def onKeyPress(app, key):
     if app.gameOver:
         return
     
+    
     if key in {'left', 'right', 'up', 'down'}:
-        if key != 'left' and key != 'right': #NEED TO CHANGE LATER TO SUCCESFUL MOVEMENT NOT BLOCKED
+        success = app.player.move(key, app.width, app.height, app.terrain)
+        if success and key != 'left' and key != 'right': #NEED TO CHANGE LATER TO SUCCESFUL MOVEMENT NOT BLOCKED
             app.score +=1
         app.terrain.terrainStarted = True
-        app.player.move(key, app.width, app.height, app.terrain)
+        #app.player.move(key, app.width, app.height, app.terrain)
 
 def redrawAll(app):
     app.terrain.drawTerrain()
