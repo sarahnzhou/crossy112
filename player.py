@@ -28,6 +28,7 @@ class Player:
     
     def move(self, direction, canvasWidth, canvasHeight, terrain):
         newX, newY = self.x, self.y
+        self.prevX = self.x
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
             newX-=self.stepSize
@@ -69,8 +70,7 @@ class Player:
 
     def updateBoat(self, boat):
         if boat and self.collision(boat, self.x, self.y):
-            #self.x += boat.speed * boat.direction
-            self.x = boat.obstacleX
+            self.x -= boat.totalDiff
             self.onBoat=True
         else:
             self.onBoat = False

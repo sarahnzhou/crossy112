@@ -25,9 +25,9 @@ obsSizes = {
 }
 obsCounts = {
     'car': random.randint(1, 2),
-    'tree': random.randint(1, 5),
+    'tree': random.randint(1, 4),
     'train': 1,
-    'boat': random.randint(1, 3)
+    'boat': random.randint(1, 2)
 }
 
 class TerrainSection:
@@ -64,7 +64,6 @@ class TerrainSection:
             for i in range(self.screenWidth // 100):
                 xOptions.append(35+i*100)
             x = random.choice(xOptions)
-
             if not any(self.isOverlapping(x, obs.obstacleX, width, obs.width) for obs in self.obstacles):
                 return x
         return random.choice([i * 100 for i in range(self.screenWidth // 100)]) # just in case all 100 dont work
@@ -83,8 +82,6 @@ class TerrainSection:
     def moveObstacles(self):
         for obs in self.obstacles:
             obs.move(self.terrainMoveSpeed)
-            # if obs.obstacleType == 'boat':
-            #     obs.obstacleX += obs.speed * obs.direction
             obs.obstacleY= self.sectY
 
 class randomGenerateTerrain:
@@ -96,10 +93,12 @@ class randomGenerateTerrain:
         #needs to have player position y
         self.terrainBlocks = []
         self.terrainStarted = False
+        self.obstaclesMoving = True
         self.baseTerrainMoveSpeed = 1.2
         self.terrainMoveSpeed = self.baseTerrainMoveSpeed # start at 1.2, later when difficulty component added then change it to a slowly increasing terrainMoveSpeed
         self.slowDownRate = 0.1 #speed of terrain movement gradually decreases when player doesn't move
         self.generateInitialTerrain()
+        
 
     def updateObstacles(self):
         for block in self.terrainBlocks:
@@ -190,7 +189,6 @@ class randomGenerateTerrain:
             if playerBlock.sectY <= player.y < playerBlock.sectY + self.blockHeight:
                 player.y += self.terrainMoveSpeed
             if playerBlock.sectType == 'water' and not player.onBoat:
-                # print("Game Over: Player is in water without a boat.")
                 self.terrainStarted = False
                 app.gameOver = True       
                 return 
@@ -217,7 +215,6 @@ class randomGenerateTerrain:
         # check if player at bottom if so game over        
         if player.y + player.height > self.screenHeight:
             app.gameOver = True
-            print('game over - hit bottom')
             self.terrainStarted = False  # Stop further terrain updates
     
     # make sure terrain blocks have no gaps

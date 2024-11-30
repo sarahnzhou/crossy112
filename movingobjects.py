@@ -14,6 +14,7 @@ class Obstacle:
         self.speed = 0
         self.images = images
         self.direction = direction
+        self.totalDiff = 0
 
     def draw(self):
         if self.obstacleType in self.images: 
@@ -31,7 +32,11 @@ class Obstacle:
             self.speed = 10 * self.direction
 
         if self.speed != 0:
-            self.obstacleX-= self.speed - terrainSpeed
+            # if self.obstacleType == 'boat':
+            #     self.obstacleX -= (self.speed)
+            # else:
+            self.totalDiff = (self.speed - terrainSpeed)
+            self.obstacleX -= self.totalDiff
             if self.obstacleX > 800:
                 self.obstacleX = -self.width
             elif self.obstacleX < -self.width:
