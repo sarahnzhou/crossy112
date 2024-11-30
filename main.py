@@ -7,7 +7,7 @@ from movingobjects import Obstacle
 
 def onAppStart(app):
     app.score = 0
-    x = app.width / 2 - 65
+    x = app.width / 2 - 50
     y = app.height - 300
     app.rightdogLink='scottieright.png'
     app.leftdogLink = 'scottieleft.png'

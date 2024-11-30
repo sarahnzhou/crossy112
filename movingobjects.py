@@ -1,5 +1,5 @@
 from cmu_graphics import *
-import random
+import random 
 
 obsTypes = {'road': 'car', 'grass': 'tree', 'water': 'boat', 'tracks': 'train'}
 

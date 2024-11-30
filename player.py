@@ -11,7 +11,7 @@ class Player:
         self.width = 110 #size of image
         self.height = 95
         self.verticalstepSize = 100
-        self.horizontalStepSize = 25
+        self.horizontalStepSize = 50
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
         self.hasMoved = False
@@ -19,17 +19,18 @@ class Player:
         #self.boat = None
 
     def collision(self, obstacle, newX, newY):
-        marginOfError = 0
-        # horizontal = (newX < obstacle.obstacleX + obstacle.width and newX + self.width - 100 > obstacle.obstacleX)
-        # vertical = (newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)
-        # return horizontal and vertical
+        marginOfError = 10
         collides = (newX + marginOfError < obstacle.obstacleX + obstacle.width - marginOfError and 
                     newX + self.width > obstacle.obstacleX + marginOfError and
                     newY + marginOfError < obstacle.obstacleY + obstacle.height - marginOfError and 
                     newY + self.height - marginOfError > obstacle.obstacleY + marginOfError)    
         return collides
     
-    def move(self, direction, canvasWidth, canvasHeight, terrain):
+    def snapToGrid(self, xCoord, gridSize):
+        #grid size player step size for now - 50
+        return rounded(xCoord/50)*50
+
+    def move(self, direction, canvasWidth, canvasHeight, terrain, gridSize = 50):
         newX, newY = self.x, self.y
         self.prevX = self.x
         moved = False
@@ -55,10 +56,11 @@ class Player:
                     if self.collision(obs, newX, newY):
                         return  #just make sure no moving
                 elif obs.obstacleType == 'boat' and self.collision(obs, newX, newY):
-                    self.updateBoat(obs)
+                    self.updateBoat(obs, terrain)
         
         if moved:
-            self.x, self.y = newX, newY
+            self.x = self.snapToGrid(newX, gridSize)
+            self.y = newY
             self.moveSound.play(restart=False)
             self.playerMoveCount += 1
             self.hasMoved = True
@@ -74,14 +76,20 @@ class Player:
                         app.gameOver = True
                         return
                     elif obs.obstacleType == 'boat':
-                        self.updateBoat(obs)        
+                        self.updateBoat(obs, terrain)        
 
-    def updateBoat(self, boat):
+    def updateBoat(self, boat, terrain):
         if boat and self.collision(boat, self.x, self.y):
             self.x -= boat.totalDiff
             self.onBoat=True
         else:
             self.onBoat = False
+            currBlock = terrain.getPlayerBlock(self)
+            if currBlock and currBlock.sectType not in ['water']:
+                gridSize = 50
+                self.snapToGrid(self.x, gridSize)
+            else:
+                self.onBoat = True
 
     def draw(self):
         drawImage(self.imageLink, self.x, self.y, width = self.width, height = self.height)

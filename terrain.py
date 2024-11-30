@@ -21,7 +21,7 @@ obsSizes = {
     'car': (80, 100), #width, height
     'tree': (50, 100),
     'train': (220, 100),
-    'boat': (250, 100)
+    'boat': (200, 100)
 }
 obsCounts = {
     'car': random.randint(1, 2),
@@ -62,7 +62,7 @@ class TerrainSection:
         for _ in range(100):
             xOptions = []
             for i in range(self.screenWidth // 100):
-                xOptions.append(35+i*100)
+                xOptions.append(50+i*100)
             x = random.choice(xOptions)
             if not any(self.isOverlapping(x, obs.obstacleX, width, obs.width) for obs in self.obstacles):
                 return x
