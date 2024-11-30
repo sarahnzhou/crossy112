@@ -32,7 +32,7 @@ class Obstacle:
             self.speed = 10 * self.direction
 
         if self.speed != 0: 
-            self.totalDiff = (self.speed - terrainSpeed)
+            self.totalDiff = (self.speed + terrainSpeed)
             self.obstacleX -= self.totalDiff
             if self.obstacleX > 800:
                 self.obstacleX = -self.width

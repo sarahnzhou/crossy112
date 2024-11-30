@@ -176,7 +176,7 @@ class randomGenerateTerrain:
                 self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 # slow down when below middle
         
         #cap speed
-        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 10)
+        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
 
         for block in self.terrainBlocks:
             if self.terrainStarted:

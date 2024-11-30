@@ -21,6 +21,7 @@ def onAppStart(app):
     app.obsImages = {'car': redCarLink, 'tree': tree1Link, 'boat': boatLink, 'train': trainLink}
 
     app.gameOver = False
+    app.isPaused = False
     app.restartButtonHovered = False
     app.player = Player(x, y, app.rightdogLink, app.leftdogLink, moveSound)
     app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages) #100 is block height, 5 is terrainmovespeed
@@ -29,7 +30,7 @@ def restart(app):
     onAppStart(app)
 
 def onStep(app):
-    if app.gameOver:
+    if app.gameOver or app.isPaused:
         return
     #app.terrain.updateObstacles()
     screenMiddle = app.height / 2
@@ -48,13 +49,17 @@ def onMousePress(app, mouseX, mouseY):
         if buttonX <= mouseX <= buttonX + buttonWidth and buttonY <= mouseY <= buttonY + buttonHeight:
             restart(app)
 
+    pauseButtonX, pauseButtonY, pauseButtonSize = app.width - 110, 10, 100
+    if pauseButtonX <= mouseX <= pauseButtonX + pauseButtonSize and pauseButtonY <= mouseY <= pauseButtonY + 40:
+        app.isPaused = not app.isPaused
+
 def onMouseMove(app, mouseX, mouseY):
     if app.gameOver:
         buttonX, buttonY, buttonWidth, buttonHeight = app.width / 2 - 100, app.height / 2 - 20, 200, 70
         app.restartButtonHovered = buttonX <= mouseX <= buttonX + buttonWidth and buttonY <= mouseY <= buttonY + buttonHeight
     
 def onKeyPress(app, key):
-    if app.gameOver:
+    if app.gameOver or app.isPaused:
         return
     
     if key in {'left', 'right', 'up', 'down'}:
@@ -68,8 +73,15 @@ def redrawAll(app):
     app.player.draw()
     drawLabel(f"Score: {app.score}", 10, 10, size=50, fill='gold', align='left-top', bold=True, border = 'black', borderWidth = 2)
 
+
+    pauseButtonX, pauseButtonY, pauseButtonSize = app.width - 110, 10, 100
+    buttonFill = 'green' if app.isPaused else 'red'
+    buttonText = 'Play' if app.isPaused else 'Pause'
+    drawRect(pauseButtonX, pauseButtonY, pauseButtonSize, 40, fill=buttonFill, border='black', borderWidth=2)
+    drawLabel(buttonText, pauseButtonX + 50, pauseButtonY + 20, size=20, fill='white', bold=True, align='center')
+
     if app.gameOver:
-        drawLabel('Game Over', app.width/2, app.height/2 - 80, size=70, bold=True, fill='red', align='center', border = 'black', borderWidth = 2)
+        drawLabel(f'Game Over: Final Score {app.score}', app.width/2, app.height/2 - 80, size=50, bold=True, fill='red', align='center', border = 'black', borderWidth = 2)
 
         buttonX, buttonY, buttonWidth, buttonHeight = app.width / 2 - 100, app.height / 2 - 20, 200, 70
         buttonColor = 'lightGray' if not app.restartButtonHovered else 'white'
