@@ -9,7 +9,8 @@ def onAppStart(app):
     app.score = 0
     x = app.width / 2 - 65
     y = app.height - 300
-    dogLink='scottie.png'
+    app.rightdogLink='scottieright.png'
+    app.leftdogLink = 'scottieleft.png'
     moveSound=Sound('dogbark.mp3')
 
     redCarLink = 'car.png'
@@ -20,7 +21,7 @@ def onAppStart(app):
     app.obsImages = {'car': redCarLink, 'tree': tree1Link, 'boat': boatLink, 'train': trainLink}
 
     app.gameOver = False
-    app.player = Player(x, y, dogLink, moveSound)
+    app.player = Player(x, y, app.rightdogLink, app.leftdogLink, moveSound)
     app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages) #100 is block height, 5 is terrainmovespeed
 
 def onStep(app):
@@ -40,8 +41,10 @@ def onStep(app):
 def onKeyPress(app, key):
     if app.gameOver:
         return
-    app.score +=1
+    
     if key in {'left', 'right', 'up', 'down'}:
+        if key != 'left' and key != 'right': #NEED TO CHANGE LATER TO SUCCESFUL MOVEMENT NOT BLOCKED
+            app.score +=1
         app.terrain.terrainStarted = True
         app.player.move(key, app.width, app.height, app.terrain)
 

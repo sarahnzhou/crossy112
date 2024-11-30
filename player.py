@@ -1,14 +1,17 @@
 from cmu_graphics import *
 
 class Player:
-    def __init__(self, userX, userY, imageLink, soundLink):
+    def __init__(self, userX, userY, rightimageLink, leftimageLink, soundLink):
         self.x = userX
         self.y = userY
-        self.imageLink = imageLink
+        self.imageLink = rightimageLink
+        self.leftimageLink = leftimageLink
+        self.rightimageLink = rightimageLink
         self.moveSound = soundLink
         self.width = 110 #size of image
         self.height = 95
-        self.stepSize = 100
+        self.verticalstepSize = 100
+        self.horizontalStepSize = 25
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
         self.hasMoved = False
@@ -21,7 +24,7 @@ class Player:
         # vertical = (newY < obstacle.obstacleY + obstacle.height and newY + self.height > obstacle.obstacleY)
         # return horizontal and vertical
         collides = (newX + marginOfError < obstacle.obstacleX + obstacle.width - marginOfError and 
-                    newX + self.width - 90 > obstacle.obstacleX + marginOfError and
+                    newX + self.width > obstacle.obstacleX + marginOfError and
                     newY + marginOfError < obstacle.obstacleY + obstacle.height - marginOfError and 
                     newY + self.height - marginOfError > obstacle.obstacleY + marginOfError)    
         return collides
@@ -31,16 +34,18 @@ class Player:
         self.prevX = self.x
         moved = False
         if direction == 'left' and self.x - 25 >= 0: # make sure no going off canvas
-            newX-=self.stepSize
+            newX-=self.horizontalStepSize
+            self.imageLink = self.leftimageLink
             moved = True
         if direction == 'right' and self.x + 25 + self.width <= canvasWidth: 
-            newX+=self.stepSize
+            newX+=self.horizontalStepSize
+            self.imageLink = self.rightimageLink
             moved = True
         if direction == 'up' and self.y - 25 >= 0: 
-            newY-=self.stepSize
+            newY-=self.verticalstepSize
             moved = True
         if direction == 'down' and self.y + 25 + self.height <= canvasHeight: 
-            newY+=self.stepSize
+            newY+=self.verticalstepSize
             moved = True
 
         block = terrain.getPlayerBlock(self, intendedY = newY)
@@ -61,7 +66,9 @@ class Player:
     def handleCollisions(self, block, terrain):
         for obs in block.obstacles:
                 if self.collision(obs, self.x, self.y):
+                    print(f"Collision detected with {obs.obstacleType} at ({obs.obstacleX}, {obs.obstacleY})")
                     if obs.obstacleType in ['car', 'train']:
+                        print("Game Over: Hit a car or train.")
                         terrain.terrainStarted = False
                         app.gameOver = True
                         return
