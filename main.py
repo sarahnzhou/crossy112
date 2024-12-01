@@ -32,7 +32,6 @@ def restart(app):
 def onStep(app):
     if app.gameOver or app.isPaused:
         return
-    #app.terrain.updateObstacles()
     screenMiddle = app.height / 2
     if not app.terrain.terrainStarted and app.player.y <= screenMiddle:
         app.terrain.terrainStarted = True
@@ -64,7 +63,7 @@ def onKeyPress(app, key):
     
     if key in {'left', 'right', 'up', 'down'}:
         success = app.player.move(key, app.width, app.height, app.terrain)
-        if success and key != 'left' and key != 'right': #NEED TO CHANGE LATER TO SUCCESFUL MOVEMENT NOT BLOCKED
+        if success and key != 'left' and key != 'right': 
             app.score +=1
         app.terrain.terrainStarted = True
 

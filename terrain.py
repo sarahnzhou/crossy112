@@ -27,7 +27,7 @@ obsCounts = {
     'car': random.randint(1, 2),
     'tree': random.randint(1, 4),
     'train': 1,
-    'boat': random.randint(1, 2)
+    'boat': random.randint(2, 2)
 }
 
 class TerrainSection:
@@ -217,6 +217,15 @@ class randomGenerateTerrain:
             app.gameOver = True
             self.terrainStarted = False  # Stop further terrain updates
     
+    def getBoats(self, player):
+        boats = []
+        for block in self.terrainBlocks:
+            if block.sectY <= player.y < block.sectY + block.blockHeight and block.sectType == 'water':
+                for obs in block.obstacles:
+                    if obs.obstacleType == 'boat': 
+                        boats.append(obs)
+        return boats
+
     # make sure terrain blocks have no gaps
     def alignTerrainBlocks(self):
         for i in range(1, len(self.terrainBlocks)):
