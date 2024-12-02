@@ -20,7 +20,7 @@ terrainColors = {
 obsSizes = {
     'car': (80, 100), #width, height
     'tree': (50, 100),
-    'train': (220, 100),
+    'train': (220, 100), 
     'boat': (200, 100)
 }
 obsCounts = {
