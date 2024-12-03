@@ -105,12 +105,18 @@ class randomGenerateTerrain:
             block.moveObstacles()
 
     #track which block the player is on so it can keep player on it
-    def getPlayerBlock(self, player, intendedY=None):
-        yPos = intendedY if intendedY is not None else player.y
+    def getPlayerBlock(self, playerX, intendedY=None):
+        if isinstance(playerX, (int, float)):  # regular mode
+            xPos = playerX
+            yPos = intendedY
+        else:  # AI mode player obj
+            xPos = playerX.sX
+            yPos = playerX.sY
+        #yPos = intendedY if intendedY is not None else player.y
         for block in self.terrainBlocks:
             if block.sectY <= yPos < block.sectY + self.blockHeight:
                 return block
-        return self.findClosestBlock(player)
+        return self.findClosestBlock(playerX)
     
     def findNextBlock(self, player):
         for block in self.terrainBlocks:
