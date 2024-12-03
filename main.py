@@ -124,7 +124,7 @@ def redrawAll(app):
         aiButtonColor = 'white' if app.menuButtonHovered == 'ai' else 'deepSkyBlue'
         regularButtonColor = 'white' if app.menuButtonHovered == 'regular' else 'deepSkyBlue'
         drawRect(0, 0, app.width, app.height, fill='lightBlue')
-        drawLabel("CROSSY112", app.width / 2, 200, size=70, font='Arial Black', bold=True, fill='white', align='center', border='black', borderWidth=5)
+        drawLabel("CROSSY112", app.width / 2, 250, size=70, font='Arial Black', bold=True, fill='white', align='center', border='black', borderWidth=5)
         drawRect(300, 350, 200, 60, fill=aiButtonColor, border='black', borderWidth=3)
         drawLabel("AI", 400, 380, size=30, font='Arial Black', bold=True, fill='black', align='center')
         drawRect(300, 450, 200, 60, fill=regularButtonColor, border='black', borderWidth=3)
