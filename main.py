@@ -17,6 +17,7 @@ def onAppStart(app):
     app.score = 0
     app.gameOver = False
     app.isPaused = False
+    app.menuButtonHovered = None
     app.restartButtonHovered = False
 
     redCarLink = 'car.png'
@@ -94,6 +95,14 @@ def onMousePress(app, mouseX, mouseY):
             app.isPaused = not app.isPaused
 
 def onMouseMove(app, mouseX, mouseY):
+    if app.mode == 'menu':
+        if 300 <= mouseX <= 500 and 350 <= mouseY <= 400:
+            app.menuButtonHovered = 'ai'   
+        elif 300 <= mouseX <= 500 and 450 <= mouseY <= 500:
+            app.menuButtonHovered = 'regular'  
+        else:
+            app.menuButtonHovered = None
+
     if app.gameOver:
         buttonX, buttonY, buttonWidth, buttonHeight = app.width / 2 - 100, app.height / 2 - 20, 200, 70
         app.restartButtonHovered = buttonX <= mouseX <= buttonX + buttonWidth and buttonY <= mouseY <= buttonY + buttonHeight
@@ -102,7 +111,7 @@ def onKeyPress(app, key):
     if app.gameOver or app.isPaused:
         return
     
-    if app.mode == 'menu' or app.mode == 'ai':
+    if app.mode == 'regular' or app.mode == 'ai':
         if key in {'left', 'right', 'up', 'down'}:
             success = app.player.move(key, app.width, app.height, app.terrain)
             if success and key != 'left' and key != 'right': 
@@ -112,11 +121,15 @@ def onKeyPress(app, key):
 def redrawAll(app):
 
     if app.mode == 'menu':
-        drawLabel("Welcome to Crossy112!", app.width / 2, 200, size=40, bold=True, fill = 'deepSkyBlue')
-        drawRect(300, 350, 200, 50, fill='powderBlue')  
-        drawLabel("AI", 400, 375, size=20)
-        drawRect(300, 450, 200, 50, fill='powderBlue') 
-        drawLabel("Regular", 400, 475, size=20)
+        aiButtonColor = 'white' if app.menuButtonHovered == 'ai' else 'deepSkyBlue'
+        regularButtonColor = 'white' if app.menuButtonHovered == 'regular' else 'deepSkyBlue'
+        drawRect(0, 0, app.width, app.height, fill='lightBlue')
+        drawLabel("CROSSY112", app.width / 2, 200, size=70, font='Arial Black', bold=True, fill='white', align='center', border='black', borderWidth=5)
+        drawRect(300, 350, 200, 60, fill=aiButtonColor, border='black', borderWidth=3)
+        drawLabel("AI", 400, 380, size=30, font='Arial Black', bold=True, fill='black', align='center')
+        drawRect(300, 450, 200, 60, fill=regularButtonColor, border='black', borderWidth=3)
+        drawLabel("REGULAR", 400, 480, size=30, font='Arial Black', bold=True, fill='black', align='center')
+        drawLabel("Choose a mode to start!", app.width / 2, 600, size=40, font='Arial', bold=False, fill='black', align='center')
     elif app.mode == 'regular':
         app.terrain.drawTerrain()
         app.player.draw()

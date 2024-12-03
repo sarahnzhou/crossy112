@@ -20,7 +20,7 @@ terrainColors = {
 obsSizes = {
     'car': (80, 100), #width, height
     'tree': (50, 100),
-    'train': (220, 100), 
+    'train': (220, 100),
     'boat': (200, 100)
 }
 obsCounts = {
@@ -105,18 +105,12 @@ class randomGenerateTerrain:
             block.moveObstacles()
 
     #track which block the player is on so it can keep player on it
-    def getPlayerBlock(self, playerX, intendedY=None):
-        if isinstance(playerX, (int, float)):  # regular mode
-            xPos = playerX
-            yPos = intendedY
-        else:  # AI mode player obj
-            xPos = playerX.sX
-            yPos = playerX.sY
-        #yPos = intendedY if intendedY is not None else player.y
+    def getPlayerBlock(self, player, intendedY=None):
+        yPos = intendedY if intendedY is not None else player.y
         for block in self.terrainBlocks:
             if block.sectY <= yPos < block.sectY + self.blockHeight:
                 return block
-        return self.findClosestBlock(playerX)
+        return self.findClosestBlock(player)
     
     def findNextBlock(self, player):
         for block in self.terrainBlocks:
