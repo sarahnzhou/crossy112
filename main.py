@@ -64,7 +64,7 @@ def onStep(app):
     
     if app.mode == 'regular':
         if app.terrain.terrainStarted:
-            app.terrain.updateTerrain(app.player)
+            app.terrain.regularModeUpdateTerr(app.player)
         else:
             screenMiddle = app.height / 2
             if app.player.y <= screenMiddle:
@@ -74,7 +74,7 @@ def onStep(app):
     elif app.mode == 'ai':
         app.ai.moveAI(app.terrain)
         if app.terrain.terrainStarted:
-            app.terrain.updateTerrain(app.ai)
+            app.terrain.aiModeUpdateTerr(app.player, app.ai)
 
 def onMousePress(app, mouseX, mouseY):
     if app.mode == 'menu':

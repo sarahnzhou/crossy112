@@ -35,7 +35,7 @@ class AIplayer:
 
     def isValidPath(self, terrain):
         for x, y in self.path:
-            block = terrain.getPlayerBlock(x * 100, y * 100)
+            block = terrain.getAIBlock(y * 100)
             if not block or block.sectType == 'water': 
                 return False
             for obs in block.obstacles:
