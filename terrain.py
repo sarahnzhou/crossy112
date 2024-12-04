@@ -111,6 +111,12 @@ class randomGenerateTerrain:
             if block.sectY <= yPos < block.sectY + self.blockHeight:
                 return block
         return self.findClosestBlock(player)
+
+    def getAIBlock(self, y):
+        for block in self.terrainBlocks:
+            if block.sectY <= y < block.sectY + self.blockHeight:
+                return block
+        return self.findClosestAIBlock(y)
     
     def findNextBlock(self, player):
         for block in self.terrainBlocks:
@@ -133,6 +139,18 @@ class randomGenerateTerrain:
         smallestDistance =  float('inf')  # start with biggest distance
         for block in self.terrainBlocks:
             distance = abs(block.sectY - player.y)
+            if distance < smallestDistance:
+                smallestDistance = distance
+                closest = block
+        return closest
+    
+    def findClosestAIBlock(self, y):
+        closest = None
+        smallestDistance = float('inf')  
+        yPos = y * self.blockHeight
+
+        for block in self.terrainBlocks:
+            distance = abs(block.sectY - yPos)
             if distance < smallestDistance:
                 smallestDistance = distance
                 closest = block

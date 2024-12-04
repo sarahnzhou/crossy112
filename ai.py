@@ -21,14 +21,14 @@ class AIplayer:
         for possibleX, possibleY in possibleMoves:
             newX, newY = x + possibleX, y + possibleY
             if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
-                block = terrain.getPlayerBlock(newX * 100, newY * 100) # getPlayerBlock(self, player, intendedY=None):
+                block = terrain.getAIBlock(newY * 100) # getPlayerBlock(self, player, intendedY=None):
                 if block:
                     weight = 1  # Default movement cost
                     for obs in block.obstacles:
                         if obs.obstacleType in ['car', 'train']:
                             if obs.impendingCollision((newX, newY)): #need to calc time + distance
                                 weight = float('inf')  # Completely avoid 
-                            elif obs.nearby(newX, newY):
+                            elif obs.nearby((newX, newY)):
                                 weight += 5  # ok for nodes near obstacles further away
                     neighbors.append((newX, newY, weight))
         return neighbors
