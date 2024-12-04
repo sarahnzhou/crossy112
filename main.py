@@ -72,9 +72,11 @@ def onStep(app):
             if app.terrain.obstaclesMoving:
                 app.terrain.updateObstacles()
     elif app.mode == 'ai':
+        if not app.terrain.terrainStarted:
+            app.terrain.terrainStarted = True
+        #if app.terrain.terrainStarted:
+        app.terrain.aiModeUpdateTerr(app.player, app.ai)
         app.ai.moveAI(app.terrain)
-        if app.terrain.terrainStarted:
-            app.terrain.aiModeUpdateTerr(app.player, app.ai)
 
 def onMousePress(app, mouseX, mouseY):
     if app.mode == 'menu':
@@ -140,18 +142,18 @@ def redrawAll(app):
         buttonText = 'Play' if app.isPaused else 'Pause'
         drawRect(pauseButtonX, pauseButtonY, pauseButtonSize, 40, fill=buttonFill, border='black', borderWidth=2)
         drawLabel(buttonText, pauseButtonX + 50, pauseButtonY + 20, size=20, fill='white', bold=True, align='center')
-
-        if app.gameOver:
-            drawLabel(f'Game Over: Final Score {app.score}', app.width/2, app.height/2 - 80, size=50, bold=True, fill='red', align='center', border = 'black', borderWidth = 2)
-
-            buttonX, buttonY, buttonWidth, buttonHeight = app.width / 2 - 100, app.height / 2 - 20, 200, 70
-            buttonColor = 'lightGray' if not app.restartButtonHovered else 'white'
-            drawRect(buttonX, buttonY, buttonWidth, buttonHeight, fill=buttonColor, border='black', borderWidth=2)
-            drawLabel('Restart', app.width / 2, app.height / 2 + 15, size=30, fill='black', bold=True, align='center')
     elif app.mode == 'ai':
         app.terrain.drawTerrain()
         app.player.draw()
         app.ai.draw()
+        
+    if app.gameOver:
+        drawLabel(f'Game Over: Final Score {app.score}', app.width/2, app.height/2 - 80, size=50, bold=True, fill='red', align='center', border = 'black', borderWidth = 2)
+
+        buttonX, buttonY, buttonWidth, buttonHeight = app.width / 2 - 100, app.height / 2 - 20, 200, 70
+        buttonColor = 'lightGray' if not app.restartButtonHovered else 'white'
+        drawRect(buttonX, buttonY, buttonWidth, buttonHeight, fill=buttonColor, border='black', borderWidth=2)
+        drawLabel('Restart', app.width / 2, app.height / 2 + 15, size=30, fill='black', bold=True, align='center')
 
 def main():
     runApp(width=800, height=800)
