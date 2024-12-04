@@ -56,7 +56,6 @@ class Obstacle:
 
         return horizNearby and vertNearby
 
-
     def impendingCollision(self, nodeCoords):
         x, y = nodeCoords
         predictObsX = self.obstacleX + self.speed * self.direction
