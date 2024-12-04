@@ -44,7 +44,7 @@ class TerrainSection:
         self.makeObstacles()
 
     def makeObstacles(self):
-        playerStartingX = 335
+        playerStartingXs = [335, 150, 550] # account for AI + player in AI mode as well
         playerStartingY = 500
         typeO = random.choice(obsTypes[self.sectType]) #if isinstance(obsTypes[self.sectType], list) else obsTypes[self.sectType]
         count = obsCounts[typeO]
@@ -53,8 +53,7 @@ class TerrainSection:
         for _ in range(count): #later associate self.difficulty with obsCount
             y = self.sectY
             x = self.getNoOverlapX(width)
- 
-            if typeO == 'tree' and (playerStartingX <= x <= playerStartingX + 100 and playerStartingY - 100<= y <= playerStartingY):
+            if typeO == 'tree' and (any(pStartX <= x <= pStartX + 100 for pStartX in playerStartingXs) and playerStartingY - 100<= y <= playerStartingY):
                 continue
             self.obstacles.append(Obstacle(typeO, x, y, self.obsImages, self.direction, width, height))
 

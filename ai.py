@@ -17,7 +17,7 @@ class AIplayer:
     
     def possibleMoves(self, x, y, terrain):
         neighbors = []
-        possibleMoves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        possibleMoves = [(-51, 0), (50, 0), (0, -50), (0, 50)]
         for possibleX, possibleY in possibleMoves:
             newX, newY = x + possibleX, y + possibleY
             if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
@@ -35,7 +35,7 @@ class AIplayer:
 
     def isValidPath(self, terrain):
         for x, y in self.path:
-            block = terrain.getAIBlock(y * 100)
+            block = terrain.getAIBlock(y)
             if not block or block.sectType == 'water': 
                 return False
             for obs in block.obstacles:
