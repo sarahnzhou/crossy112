@@ -191,7 +191,6 @@ class randomGenerateTerrain:
         frequencyMultiplier = player.playerMoveCount * 0.01 if not ai else max(player.playerMoveCount * 0.01, 0)
         proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.sY * 100) / self.blockHeight)
         scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01)
-        self.terrainMoveSpeed = min(self.baseTerrainMoveSpeed * scalingFactor, 15)
 
         #currBlock = self.getPlayerBlock(player)
         # if currBlock:
@@ -217,11 +216,7 @@ class randomGenerateTerrain:
                     player.y += self.terrainMoveSpeed
 
         #determine how fast to move terrain
-        if ai:
-            closestY = min(player.y, ai.sY * 100) 
-        else:
-            closestY = player.y #reg mode only player
-
+        closestY = min(player.y, ai.sY * 100) if ai else player.y
         if closestY < veryTopY + self.blockHeight:
             distanceFromVeryTop = max(veryTopY - closestY, 1)
             self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor)/distanceFromVeryTop
@@ -231,6 +226,7 @@ class randomGenerateTerrain:
         else:
             if self.terrainMoveSpeed >= 1.8:
                 self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 
+
 
         #make sure moving fast enough so ideally top not reached
         # if player.y < veryTopY + self.blockHeight:
@@ -244,7 +240,7 @@ class randomGenerateTerrain:
         #         self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 # slow down when below middle
         
         #cap speed
-        #self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
+        self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
 
         for block in self.terrainBlocks:
             #if self.terrainStarted:
@@ -287,7 +283,7 @@ class randomGenerateTerrain:
                 bottomBlock = block
 
         # check if player at bottom if so game over        
-        if player.y + player.height > self.screenHeight:
+        if player.y + player.height > self.screenHeight or (ai and ai.sY * 100 + 100 > self.screenHeight):
             app.gameOver = True
             self.terrainStarted = False  # Stop further terrain updates
     

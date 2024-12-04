@@ -42,11 +42,11 @@ def startRegularMode(app):
 def startAIMode(app):
     generateNewTerrain(app)
 
-    x = 0.25 * app.width
+    x = 0.25 * app.width - 50
     y = app.height - 300
     app.player = Player(x, y, app.rightdogLink, app.leftdogLink, app.moveSound)
 
-    startX = 0.75 * app.width
+    startX = 0.75 * app.width - 50
     startY = app.height - 300
     endX = 0.75 * app.width
     endY = 0 # change to somehow be 25 steps length

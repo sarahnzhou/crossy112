@@ -83,4 +83,4 @@ class AIplayer:
             self.sX, self.sY = self.path.pop(0)
 
     def draw(self):
-        drawImage(self.imageLink, self.sX * 100, self.sY * 100, width = 110, height = 95)
+        drawImage(self.imageLink, self.sX, self.sY, width = 110, height = 95)
