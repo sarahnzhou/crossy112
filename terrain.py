@@ -208,8 +208,9 @@ class randomGenerateTerrain:
                     player.y += self.terrainMoveSpeed 
 
             if currAIBlock:
-                if currAIBlock.sectY <= ai.sY < currAIBlock.sectY + self.blockHeight:
-                    ai.sY += self.terrainMoveSpeed / 100 
+                if currAIBlock.sectY <= ai.sY * 100 < currAIBlock.sectY + self.blockHeight:
+                    ai.sY += self.terrainMoveSpeed
+                    print(ai.sY)
         else:
             currBlock = self.getPlayerBlock(player)
             if currBlock:

@@ -133,10 +133,6 @@ class AIplayer:
                             break
                 self.sX, self.sY = newX, newY
             self.lastMoved = currTime
-        else:
-            if currBlock:
-                self.sY += terrain.terrainMoveSpeed
-
 
     def draw(self):
         drawImage(self.imageLink, self.sX, self.sY, width = 110, height = 95)
