@@ -259,7 +259,7 @@ class randomGenerateTerrain:
                 player.y += self.terrainMoveSpeed
             if playerBlock.sectType == 'water' and not player.onBoat:
                 self.terrainStarted = False
-                app.gameOver = True       
+                app.gameOver = True
                 return 
         
         # move player w curr block
@@ -282,7 +282,7 @@ class randomGenerateTerrain:
                 bottomBlock = block
 
         # check if player at bottom if so game over        
-        if player.y + player.height > self.screenHeight or (ai and ai.sY * 100 + 100 > self.screenHeight):
+        if player.y + player.height > self.screenHeight or (ai and ai.sY + 100 > self.screenHeight):
             app.gameOver = True
             self.terrainStarted = False  # Stop further terrain updates
     
