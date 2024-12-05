@@ -179,6 +179,8 @@ class randomGenerateTerrain:
             return 
     
         player.onBoat = False
+        if ai:
+            ai.onBoat = False
 
         targetY = self.screenHeight // 2 #area to keep player in - roughly middle
         veryTopY = self.blockHeight # keep area out of this area - speed up more when it is
@@ -188,7 +190,7 @@ class randomGenerateTerrain:
         # scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01) 
 
         frequencyMultiplier = player.playerMoveCount * 0.01 if not ai else max(player.playerMoveCount * 0.01, 0)
-        proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.sY * 100) / self.blockHeight)
+        proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.sY) / self.blockHeight)
         scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01)
 
         #currBlock = self.getPlayerBlock(player)
@@ -199,14 +201,14 @@ class randomGenerateTerrain:
         #move player and ai with terrain move
         if ai:
             currBlock = self.getPlayerBlock(player)
-            currAIBlock = self.getAIBlock(ai.sY * 100)  
+            currAIBlock = self.getAIBlock(ai.sY)  
 
             if currBlock:
                 if currBlock.sectY <= player.y < currBlock.sectY + self.blockHeight:
                     player.y += self.terrainMoveSpeed 
 
             if currAIBlock:
-                if currAIBlock.sectY <= ai.sY * 100 < currAIBlock.sectY + self.blockHeight:
+                if currAIBlock.sectY <= ai.sY < currAIBlock.sectY + self.blockHeight:
                     ai.sY += self.terrainMoveSpeed / 100 
         else:
             currBlock = self.getPlayerBlock(player)
@@ -215,7 +217,7 @@ class randomGenerateTerrain:
                     player.y += self.terrainMoveSpeed
 
         #determine how fast to move terrain
-        closestY = min(player.y, ai.sY * 100) if ai else player.y
+        closestY = min(player.y, ai.sY) if ai else player.y
         if closestY < veryTopY + self.blockHeight:
             distanceFromVeryTop = max(veryTopY - closestY, 1)
             self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor)/distanceFromVeryTop
@@ -248,7 +250,7 @@ class randomGenerateTerrain:
             player.handleCollisions(block, self)
 
         if ai:
-            aiBlock = self.getAIBlock(ai.sY * 100)
+            aiBlock = self.getAIBlock(ai.sY)
             if aiBlock and aiBlock.sectType == 'water':
                 app.gameOver = True
                 self.terrainStarted = False
