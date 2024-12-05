@@ -118,12 +118,12 @@ class AIplayer:
 
     def moveAI(self, terrain):
         currTime = time()
+        currBlock = terrain.getAIBlock(self.sY)
         if currTime - self.lastMoved >= self.stepsPerSec:
             if not self.path or not self.isValidPath(terrain):
                 self.aStar(terrain) #recalculate path
             if self.path:
                 newX, newY = self.path.pop(0)
-                currBlock = terrain.getAIBlock(self.sY)
                 if currBlock:
                     for obs in currBlock.obstacles:
                         if obs.obstacleType == 'tree' and self.collision(obs, newX, newY):
@@ -134,7 +134,8 @@ class AIplayer:
                 self.sX, self.sY = newX, newY
             self.lastMoved = currTime
         else:
-            self.sY += terrain.terrainMoveSpeed
+            if currBlock:
+                self.sY += terrain.terrainMoveSpeed
 
 
     def draw(self):
