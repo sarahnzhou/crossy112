@@ -146,7 +146,13 @@ def redrawAll(app):
         app.terrain.drawTerrain()
         app.player.draw()
         app.ai.draw()
-        
+
+        pauseButtonX, pauseButtonY, pauseButtonSize = app.width - 110, 10, 100
+        buttonFill = 'green' if app.isPaused else 'red'
+        buttonText = 'Play' if app.isPaused else 'Pause'
+        drawRect(pauseButtonX, pauseButtonY, pauseButtonSize, 40, fill=buttonFill, border='black', borderWidth=2)
+        drawLabel(buttonText, pauseButtonX + 50, pauseButtonY + 20, size=20, fill='white', bold=True, align='center')
+
     if app.gameOver:
         drawLabel(f'Game Over: Final Score {app.score}', app.width/2, app.height/2 - 80, size=50, bold=True, fill='red', align='center', border = 'black', borderWidth = 2)
 

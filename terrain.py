@@ -170,7 +170,7 @@ class randomGenerateTerrain:
     def aiModeUpdateTerr(self, player, ai):
         self.updateTerrain(player, ai)
         # if either player "falls" off visible screen
-        if player.y + player.height > self.screenHeight or ai.sY * 100 + 100 > self.screenHeight:
+        if player.y + player.height > self.screenHeight or ai.sY  + 100 > self.screenHeight:
             app.gameOver = True
             self.terrainStarted = False
     

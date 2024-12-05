@@ -17,11 +17,11 @@ class AIplayer:
     
     def possibleMoves(self, x, y, terrain):
         neighbors = []
-        possibleMoves = [(-51, 0), (50, 0), (0, -50), (0, 50)]
+        possibleMoves = [(-50, 0), (50, 0), (0, -50), (0, 50)]
         for possibleX, possibleY in possibleMoves:
             newX, newY = x + possibleX, y + possibleY
             if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
-                block = terrain.getAIBlock(newY * 100) # getPlayerBlock(self, player, intendedY=None):
+                block = terrain.getAIBlock(newY) # getPlayerBlock(self, player, intendedY=None):
                 if block:
                     weight = 1  # Default movement cost
                     for obs in block.obstacles:
