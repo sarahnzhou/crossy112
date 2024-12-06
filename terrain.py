@@ -172,6 +172,7 @@ class randomGenerateTerrain:
         # if either player "falls" off visible screen
         if player.y + player.height > self.screenHeight or ai.sY  + 100 > self.screenHeight:
             app.gameOver = True
+            print("fell off ai")
             self.terrainStarted = False
     
     def updateTerrain(self, player, ai = None):
@@ -201,16 +202,16 @@ class randomGenerateTerrain:
         #move player and ai with terrain move
         if ai:
             currBlock = self.getPlayerBlock(player)
-            currAIBlock = self.getAIBlock(ai.sY)  
+            currAIBlock = self.getAIBlock(ai.sY)
 
             if currBlock:
                 if currBlock.sectY <= player.y < currBlock.sectY + self.blockHeight:
                     player.y += self.terrainMoveSpeed 
 
             if currAIBlock:
-                if currAIBlock.sectY <= ai.sY * 100 < currAIBlock.sectY + self.blockHeight:
+                if currAIBlock.sectY <= ai.sY < currAIBlock.sectY + self.blockHeight:
                     ai.sY += self.terrainMoveSpeed
-                    print(ai.sY)
+                
         else:
             currBlock = self.getPlayerBlock(player)
             if currBlock:
@@ -253,8 +254,11 @@ class randomGenerateTerrain:
         if ai:
             aiBlock = self.getAIBlock(ai.sY)
             if aiBlock and aiBlock.sectType == 'water':
-                app.gameOver = True
-                self.terrainStarted = False
+                boats = self.getAIBoats(ai)
+                if not any(ai.collision(boat, ai.sX, ai.sY) for boat in boats):
+                    app.gameOver = True
+                    self.terrainStarted = False
+                    print("ai water")
 
         playerBlock = self.getPlayerBlock(player)
         if playerBlock:
@@ -293,6 +297,15 @@ class randomGenerateTerrain:
         boats = []
         for block in self.terrainBlocks:
             if block.sectY <= player.y < block.sectY + block.blockHeight and block.sectType == 'water':
+                for obs in block.obstacles:
+                    if obs.obstacleType == 'boat': 
+                        boats.append(obs)
+        return boats
+    
+    def getAIBoats(self, ai):
+        boats = []
+        for block in self.terrainBlocks:
+            if block.sectY <= ai.sY < block.sectY + block.blockHeight and block.sectType == 'water':
                 for obs in block.obstacles:
                     if obs.obstacleType == 'boat': 
                         boats.append(obs)

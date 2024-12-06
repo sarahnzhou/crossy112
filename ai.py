@@ -15,10 +15,9 @@ class AIplayer:
         self.dimension = 800
         self.path = []
         self.lastMoved = time()
-        self.stepsPerSec = 0.5 
-
+ 
     def collision(self, obstacle, newX, newY):
-        marginOfError = 10
+        marginOfError = 50
         collides = (newX + marginOfError < obstacle.obstacleX + obstacle.width - marginOfError and 
                     newX + self.width > obstacle.obstacleX + marginOfError and
                     newY + marginOfError < obstacle.obstacleY + obstacle.height - marginOfError and 
@@ -49,22 +48,31 @@ class AIplayer:
             newX, newY = x + possibleX, y + possibleY
             if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
                 block = terrain.getAIBlock(newY) # getPlayerBlock(self, player, intendedY=None):
+                print(f"Checking neighbor: ({newX}, {newY}) in Block: {block}")
                 if block:
                     weight = 1  #default movement cost
                     collides = False
                     for obs in block.obstacles:
+                        print(f"Checking obstacle: {obs.obstacleType} at ({obs.obstacleX}, {obs.obstacleY})")
                         if obs.obstacleType == 'tree': 
+                            print("hi tree")
                             if self.collision(obs, newX, newY):
+                                print(f"Collision with tree at ({newX}, {newY})")
                                 collides = True
                                 break
+                            else:
+                                print("no collide tree")
                         elif obs.obstacleType == 'boat': 
+                            print("hi boat")
                             if self.collision(obs, newX, newY):
                                 weight -= 1  
                                 self.onBoat = True
                                 break
                         if obs.obstacleType in ['car', 'train']:
+                            print(f"hi {obs.obstacleType}")
                             if obs.impendingCollision((newX, newY)): #need to calc time + distance
                                 weight = float('inf')  #completely avoid 
+                                print(f"Collision with car/train at ({newX}, {newY})")
                                 collides = True
                                 break
                             elif obs.nearby((newX, newY)):
@@ -84,6 +92,7 @@ class AIplayer:
         return True
 
     def aStar(self, terrain):
+        print('using a star')
         start = (self.sX, self.sY)
         finish = (self.eX, self.eY)
         openList = []
@@ -101,10 +110,13 @@ class AIplayer:
                     self.path.append(current)
                     current = prevSteps[current]
                 self.path.reverse()
+            
+            print(self.path, "hi hih hi")
 
             currG = gCounts[current]
             currX, currY = current
             neighbors = self.possibleMoves(currX, currY, terrain)
+            print("hi at neigbors")
             for newX, newY, weight in neighbors:
                 if weight == float('inf'):  #skip possible collisions
                     continue
@@ -119,20 +131,25 @@ class AIplayer:
     def moveAI(self, terrain):
         currTime = time()
         currBlock = terrain.getAIBlock(self.sY)
-        if currTime - self.lastMoved >= self.stepsPerSec:
-            if not self.path or not self.isValidPath(terrain):
-                self.aStar(terrain) #recalculate path
-            if self.path:
-                newX, newY = self.path.pop(0)
-                if currBlock:
-                    for obs in currBlock.obstacles:
-                        if obs.obstacleType == 'tree' and self.collision(obs, newX, newY):
-                            return 
-                        elif obs.obstacleType == 'boat' and self.collision(obs, newX, newY):
-                            self.updateBoat(obs, terrain) 
-                            break
-                self.sX, self.sY = newX, newY
-            self.lastMoved = currTime
+        print(f"Current Block at Y={self.sY}: {currBlock}")
+        #if currTime - self.lastMoved >= 0.5:
+        if not self.path or not self.isValidPath(terrain):
+            self.aStar(terrain) #recalculate path
+            print('recalculating')
+        if self.path:
+            print(f"Moving along path: {self.path}")
+            newX, newY = self.path.pop(0)
+            if currBlock:
+                for obs in currBlock.obstacles:
+                    if obs.obstacleType == 'tree' and self.collision(obs, newX, newY):
+                        return 
+                    elif obs.obstacleType == 'boat' and self.collision(obs, newX, newY):
+                        self.updateBoat(obs, terrain) 
+                        break
+            self.sX, self.sY = newX, newY
+        # else:
+        #     print("No valid path found.")
+        # self.lastMoved = currTime
 
     def draw(self):
         drawImage(self.imageLink, self.sX, self.sY, width = 110, height = 95)
