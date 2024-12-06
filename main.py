@@ -19,6 +19,7 @@ def onAppStart(app):
     app.isPaused = False
     app.menuButtonHovered = None
     app.restartButtonHovered = False
+    app.firstPlayerMoveMade = False
 
     redCarLink = 'car.png'
     tree1Link = 'blocktree.png'
@@ -72,6 +73,8 @@ def onStep(app):
             if app.terrain.obstaclesMoving:
                 app.terrain.updateObstacles()
     elif app.mode == 'ai':
+        if not app.firstPlayerMoveMade:
+            return
         if not app.terrain.terrainStarted:
             app.terrain.terrainStarted = True
         #if app.terrain.terrainStarted:
@@ -116,8 +119,11 @@ def onKeyPress(app, key):
     if app.mode == 'regular' or app.mode == 'ai':
         if key in {'left', 'right', 'up', 'down'}:
             success = app.player.move(key, app.width, app.height, app.terrain)
-            if success and key != 'left' and key != 'right': 
-                app.score +=1
+            if success:
+                if not app.firstPlayerMoveMade:
+                    app.firstPlayerMoveMade = True
+                if key != 'left' and key != 'right': 
+                    app.score +=1
             app.terrain.terrainStarted = True
 
 def redrawAll(app):

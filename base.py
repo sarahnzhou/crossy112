@@ -61,13 +61,6 @@ class basePlayer:
 
         # If no overlap with other boats, the player is in water
         return True
-        
-    def hangingRegion(self, startX, endX, otherBoats, currBoat):
-        for other in otherBoats:
-            if other != currBoat:
-                if startX < other.obstacleX + other.width and endX > other.obstacleX:
-                    return False #overlap other boat
-        return True #overlap water
     
     def updateBoat(self, boat, terrain):
         if boat and self.collision(boat, self.x, self.y):

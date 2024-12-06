@@ -38,23 +38,12 @@ class Obstacle:
                 self.obstacleX = -self.width
             elif self.obstacleX < -self.width:
                 self.obstacleX = 800 
-
-    def nearby(self, nodeCoords):
+    
+    def collisionSoon(self, nodeCoords, impactTime):
         nodeX, nodeY = nodeCoords
-        proximity = 50
-
+        futureObsX = self.obstacleX + impactTime*(self.speed * self.direction)
+        futureObsY = self.obstacleY
         return (
-            nodeX + 100 > self.obstacleX - proximity and nodeX < self.obstacleX + self.width + proximity and
-            nodeY + 100 > self.obstacleY - proximity and nodeY < self.obstacleY + self.height + proximity
-        )
-        return horizNearby and vertNearby
-
-    def impendingCollision(self, nodeCoords):
-        nodeX, nodeY = nodeCoords
-        predictObsX = self.obstacleX + self.speed #* self.direction
-        predictObsY = self.obstacleY 
-
-        return (
-            nodeX < predictObsX + self.width and nodeX + 100 > predictObsX and
-            nodeY < predictObsY + self.height and nodeY + 100 > predictObsY
+            nodeX + 110 > futureObsX and nodeX < futureObsX + self.width and
+            nodeY + 95 > futureObsY and nodeY < futureObsY + self.height
         )

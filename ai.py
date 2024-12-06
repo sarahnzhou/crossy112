@@ -3,7 +3,6 @@ import heapq
 from cmu_graphics import *
 from time import time
 
-
 #determine ai's move (shortest/fastest path to finish line)
 class AIplayer(basePlayer):
     def __init__ (self, startX, startY, endX, endY, rightimageLink, leftImageLink):
@@ -14,32 +13,6 @@ class AIplayer(basePlayer):
         self.dimension = 800
         self.path = []
         self.lastMoved = time()
-        # self.sX = startX
-        # self.sY = startY
-        # self.width = 110
-        # self.height = 95
- 
-    # def collision(self, obstacle, newX, newY):
-    #     marginOfError = 50
-    #     collides = (newX + marginOfError < obstacle.obstacleX + obstacle.width - marginOfError and 
-    #                 newX + self.width > obstacle.obstacleX + marginOfError and
-    #                 newY + marginOfError < obstacle.obstacleY + obstacle.height - marginOfError and 
-    #                 newY + self.height - marginOfError > obstacle.obstacleY + marginOfError)    
-    #     return collides
-
-    # def updateBoat(self, boat, terrain):
-    #     if boat and self.collision(boat, self.sX, self.sY):
-    #         overlapXStart = max(self.sX, boat.obstacleX)
-    #         overlapXEnd = min(self.sX + self.width, boat.obstacleX + boat.width)
-    #         overlapWidth = max(0, overlapXEnd - overlapXStart)
-
-    #         if overlapWidth >= (self.width / 2): 
-    #             self.sX -= boat.totalDiff
-    #             self.onBoat = True
-    #         else:
-    #             self.onBoat = False
-    #             app.gameOver = True
-    #         self.onBoat = False
 
     def calcH(self, x, y):
         return abs(x - self.eX) + abs(y - self.eY)
@@ -47,53 +20,42 @@ class AIplayer(basePlayer):
     def possibleMoves(self, x, y, terrain):
         neighbors = []
         possibleMoves = [(-50, 0), (50, 0), (0, -100), (0, 100)]
+        # if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
         for possibleX, possibleY in possibleMoves:
             newX, newY = x + possibleX, y + possibleY
             block = terrain.getAIBlock(newY)
+            print(f"Checking new position: ({newX}, {newY}), Block: {block}")
             if block:
-                valid = True
+                weight = 1
+                collides = False
                 for obs in block.obstacles:
-                    if obs.obstacleType in ['tree', 'car', 'train'] and self.collision(obs, newX, newY):
-                        valid = False
-                        break
-                if valid:
-                    neighbors.append((newX, newY, 1))
+                    if obs.obstacleType == 'tree': 
+                        print("hi tree")
+                        if self.collision(obs, newX, newY):
+                            print(f"Collision with tree at ({newX}, {newY})")
+                            collides = True
+                            break
+                        else:
+                            print("no collide tree")
+                    elif obs.obstacleType == 'boat': 
+                        print("hi boat")
+                        if self.collision(obs, newX, newY):
+                            weight -= 1  
+                            self.onBoat = True
+                            break
+                    if obs.obstacleType in ['car', 'train']:
+                        print(f"hi {obs.obstacleType}")
+                        if obs.impendingCollision((newX, newY)): #need to calc time + distance
+                            weight = float('inf')  #completely avoid 
+                            print(f"Collision with car/train at ({newX}, {newY})")
+                            collides = True
+                            break
+                        elif obs.nearby((newX, newY)):
+                            weight += 5  # ok for nodes near obstacles further away
+                if not collides and weight < float('inf'):
+                    neighbors.append((newX, newY, weight))
         return neighbors
-            # if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
-            #     block = terrain.getAIBlock(newY) # getPlayerBlock(self, player, intendedY=None):
-            #     print(f"Checking neighbor: ({newX}, {newY}) in Block: {block}")
-            #     if block:
-            #         weight = 1  #default movement cost
-            #         collides = False
-            #         for obs in block.obstacles:
-            #             print(f"Checking obstacle: {obs.obstacleType} at ({obs.obstacleX}, {obs.obstacleY})")
-            #             if obs.obstacleType == 'tree': 
-            #                 print("hi tree")
-            #                 if self.collision(obs, newX, newY):
-            #                     print(f"Collision with tree at ({newX}, {newY})")
-            #                     collides = True
-            #                     break
-            #                 else:
-            #                     print("no collide tree")
-            #             elif obs.obstacleType == 'boat': 
-            #                 print("hi boat")
-            #                 if self.collision(obs, newX, newY):
-            #                     weight -= 1  
-            #                     self.onBoat = True
-            #                     break
-            #             if obs.obstacleType in ['car', 'train']:
-            #                 print(f"hi {obs.obstacleType}")
-            #                 if obs.impendingCollision((newX, newY)): #need to calc time + distance
-            #                     weight = float('inf')  #completely avoid 
-            #                     print(f"Collision with car/train at ({newX}, {newY})")
-            #                     collides = True
-            #                     break
-            #                 elif obs.nearby((newX, newY)):
-            #                     weight += 5  # ok for nodes near obstacles further away
-            #         if not collides:
-            #             neighbors.append((newX, newY, weight))
-        #return neighbors
-
+     
     def isValidPath(self, terrain):
         for x, y in self.path:
             block = terrain.getAIBlock(y)
