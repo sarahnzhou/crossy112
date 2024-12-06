@@ -17,65 +17,6 @@ class AIplayer(basePlayer):
     def calcH(self, x, y):
         return abs(x - self.eX) + abs(y - self.eY)
     
-    def possibleMoves(self, x, y, terrain):
-        neighbors = []
-        possibleMoves = [(-50, 0), (50, 0), (0, -100), (0, 100)]
-        # if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
-        for possibleX, possibleY in possibleMoves:
-            newX, newY = x + possibleX, y + possibleY
-            block = terrain.getAIBlock(newY)
-            print(f"Checking new position: ({newX}, {newY}), Block: {block}")
-            if block:
-                totalWeight = 1
-                for obs in block.obstacles:
-                    weight, collides = self.evaluateCollisions(obs, (newX, newY), block)
-                    totalWeight+=weight
-                    if collides:
-                        break
-                    if not collides and totalWeight < float('inf'):
-                        neighbors.append((newX, newY, totalWeight))
-
-
-                    # if obs.collisionSoon((newX, newY), 0):
-                    #     print(f"Collision with {obs.obstacleType} at ({newX}, {newY})")
-                    #     collides = True
-                    #     break
-                    # #need to account for tree
-
-                    # # if obs.obstacleType == 'tree': 
-                    # #     print("hi tree")
-                    # #     if self.collision(obs, newX, newY):
-                    # #         print(f"Collision with tree at ({newX}, {newY})")
-                    # #         collides = True
-                    # #         break
-                    # #     else:
-                    # #         print("no collide tree")
-                    # elif obs.obstacleType == 'boat' and obs.collisionSoon((newX, newY), 3): 
-                    #     print("hi boat")
-                    #     weight -= 1  
-                    #     self.onBoat = True
-                    #     break
-                    # if obs.obstacleType in ['car', 'train']:
-                    #     print(f"hi {obs.obstacleType}")
-                    #     if obs.collisionSoon((newX, newY), 3): #need to calc time + distance
-                    #         weight = float('inf')  #completely avoid 
-                    #         print(f"Collision with car/train at ({newX}, {newY})")
-                    #         collides = True
-                    #         break
-                    #     elif obs.collisionSoon((newX, newY), 5):
-                    #         weight += 5  # ok for nodes near obstacles further away
-        return neighbors
-     
-    # def isValidPath(self, terrain):
-    #     for x, y in self.path:
-    #         block = terrain.getAIBlock(y)
-    #         if not block or block.sectType == 'water': 
-    #             return False
-    #         for obs in block.obstacles:
-    #             if obs.obstacleType in ['car', 'train'] and obs.collisionSoon((x, y), 5):
-    #                 return False 
-    #     return True
-
     def evaluateCollisions(self, obs, coords, block = None):
         x, y = coords 
         if block and block.sectType == 'water':
@@ -92,6 +33,26 @@ class AIplayer(basePlayer):
             elif obs.collisionSoon((x, y), 5): #nearby
                 return 5, False 
         return 1, False
+    
+    def possibleMoves(self, x, y, terrain):
+        neighbors = []
+        possibleMoves = [(-50, 0), (50, 0), (0, -100), (0, 100)]
+        # if 0 <= newX < self.dimension and 0 <= newY < self.dimension:
+        for possibleX, possibleY in possibleMoves:
+            newX, newY = x + possibleX, y + possibleY
+            block = terrain.getAIBlock(newY)
+            print(f"Checking new position: ({newX}, {newY}), Block: {block}")
+            if block:
+                totalWeight = 1
+                collides = False
+                for obs in block.obstacles:
+                    weight, collides = self.evaluateCollisions(obs, (newX, newY), block)
+                    totalWeight+=weight
+                    if collides:
+                        break
+                if not collides and totalWeight < float('inf'):
+                    neighbors.append((newX, newY, totalWeight))
+        return neighbors
 
     def aStar(self, terrain):
         print('using a star')
@@ -112,6 +73,7 @@ class AIplayer(basePlayer):
                     self.path.append(current)
                     current = prevSteps[current]
                 self.path.reverse()
+                return
             
             print(self.path, "hi hih hi")
 
@@ -145,6 +107,7 @@ class AIplayer(basePlayer):
                 for obs in currBlock.obstacles:
                     weight, collision = self.evaluateCollisions(obs, (newX, newY), currBlock)
                     if collision:
+                        self.aStar(terrain)  # Recalculate path
                         return
             self.x, self.y = newX, newY
         # else:

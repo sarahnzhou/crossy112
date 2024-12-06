@@ -194,12 +194,6 @@ class randomGenerateTerrain:
         proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.y) / self.blockHeight)
         scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01)
 
-        #currBlock = self.getPlayerBlock(player)
-        # if currBlock:
-        #     if currBlock.sectY <= player.y < currBlock.sectY + self.blockHeight:
-        #         player.y += self.terrainMoveSpeed
-        
-        #move player and ai with terrain move
         if ai:
             currBlock = self.getPlayerBlock(player)
             currAIBlock = self.getAIBlock(ai.y)
@@ -230,19 +224,6 @@ class randomGenerateTerrain:
             if self.terrainMoveSpeed >= 1.8:
                 self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 
 
-
-        #make sure moving fast enough so ideally top not reached
-        # if player.y < veryTopY + self.blockHeight:
-        #     distanceFromVeryTop = max(veryTopY - player.y, 1)
-        #     self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor) / distanceFromVeryTop
-        # elif player.y < targetY:
-        #     distanceFromTarget = targetY - player.y
-        #     self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor) * (distanceFromTarget / self.screenHeight)
-        # else: 
-        #     if self.terrainMoveSpeed >= 1.8:
-        #         self.terrainMoveSpeed -= self.terrainMoveSpeed * 0.4 # slow down when below middle
-        
-        #cap speed
         self.terrainMoveSpeed = min(self.terrainMoveSpeed, 15)
 
         for block in self.terrainBlocks:
