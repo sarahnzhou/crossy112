@@ -9,6 +9,7 @@ class Player(basePlayer):
         self.speedDecay = 0.1
         self.hasMoved = False
    
+   # https://stackoverflow.com/questions/63926261/python-how-to-make-drawn-elements-snap-to-grid-in-pygame
     def snapToGrid(self, xCoord, gridSize):
         #grid size player step size for now - 50
         return rounded(xCoord/50)*50

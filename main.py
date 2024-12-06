@@ -21,14 +21,14 @@ def onAppStart(app):
     app.restartButtonHovered = False
     app.firstPlayerMoveMade = False
 
-    redCarLink = 'car.png'
-    tree1Link = 'blocktree.png'
-    boatLink = 'plank.png'
-    trainLink = 'bus.png'
-    app.rightdogLink='scottieright.png'
+    redCarLink = 'car.png' # https://en.ac-illust.com/clip-art/816898/light-car--orange- 
+    tree1Link = 'blocktree.png' # https://opentrees.org/cubetree-logo.png 
+    boatLink = 'plank.png' # https://www.freepik.com/premium-vector/colorful-rectangular-board-with-wood-texture-isolated-white-background-background-text_30733639.htm 
+    trainLink = 'bus.png' # https://stock.adobe.com/ro/images/side-view-of-two-city-buses/106366243 
+    app.rightdogLink='scottieright.png' # https://society6.com/a/products/the-scottish-terrier_print?sku=s6-8665841p4a1v45 
     app.leftdogLink = 'scottieleft.png'
     app.obsImages = {'car': redCarLink, 'tree': tree1Link, 'boat': boatLink, 'train': trainLink}
-    app.moveSound=Sound('dogbark.mp3')
+    app.moveSound=Sound('dogbark.mp3') # https://pixabay.com/sound-effects/dog-bark-179915/ 
 
 def generateNewTerrain(app):
     app.terrain = randomGenerateTerrain(app.height, app.width, app.obsImages)

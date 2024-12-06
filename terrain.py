@@ -18,7 +18,7 @@ terrainColors = {
     'tracks': 'dimGray'
 }
 obsSizes = {
-    'car': (80, 100), #width, height
+    'car': (100, 100), #width, height
     'tree': (50, 100),
     'train': (220, 100),
     'boat': (200, 100)
@@ -205,7 +205,8 @@ class randomGenerateTerrain:
             if currAIBlock:
                 if currAIBlock.sectY <= ai.y * 100 < currAIBlock.sectY + self.blockHeight:
                     ai.y += self.terrainMoveSpeed
-                
+             
+            
         else:
             currBlock = self.getPlayerBlock(player)
             if currBlock:

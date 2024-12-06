@@ -13,6 +13,7 @@ class AIplayer(basePlayer):
         self.dimension = 800
         self.path = []
         self.lastMoved = time()
+        self.isMoving = False
 
     def calcH(self, x, y):
         return abs(x - self.eX) + abs(y - self.eY)
@@ -29,7 +30,7 @@ class AIplayer(basePlayer):
         if obs.obstacleType == 'tree':
             if self.collision(obs, x, y):
                 return float('inf'), True
-
+            #return float('inf'), True
         if obs.obstacleType in ['car', 'train']:
             if obs.collisionSoon((x, y), 3):
                 return float('inf'), True
@@ -101,12 +102,13 @@ class AIplayer(basePlayer):
        # self.path = []  # Clear the path if no valid route is found
 
     def moveAI(self, terrain):
+        self.isMoving = True
         currTime = time()
         currBlock = terrain.getAIBlock(self.y)
         print(f"Current Block at Y={self.y}: {currBlock}")
         if currTime - self.lastMoved >= 0.5:
             if not self.path:
-                self.aStar(terrain) #recalculate path
+                self.aStar(terrain)
                 print('recalculating')
             if self.path:
                 print(f"Moving along path: {self.path}")
@@ -115,14 +117,10 @@ class AIplayer(basePlayer):
                     for obs in currBlock.obstacles:
                         weight, collision = self.evaluateCollisions(obs, (newX, newY), currBlock)
                         if collision:
-                            self.aStar(terrain)  # Recalculate path
+                            self.aStar(terrain)
                             return
-                        # if obs.obstacleType == 'tree' and self.collision(obs, newX, newY):
-                        #     return 
-                        # elif obs.obstacleType == 'boat' and self.collision(obs, newX, newY):
-                        #     self.updateBoat(obs, terrain) 
-                        #     break
                 self.x, self.y = newX, newY
+            self.isMoving = False
             self.lastMoved = currTime
 
     def draw(self):
