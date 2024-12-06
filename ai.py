@@ -54,25 +54,27 @@ class AIplayer(basePlayer):
     #                 if not collides: #and totalWeight < float('inf'):
     #                     neighbors.append((newX, newY, totalWeight))
     #     return neighbors
+    # 
     def evaluateCollisions(self, obs, coords, block=None):
         x, y = coords
         if block and block.sectType == 'water':
             if obs.obstacleType == 'boat' and self.collision(obs, x, y):
-                return -1, False  # Favor moving onto the boat
+                return -1, False  # Encourage moving onto the boat
             elif obs.obstacleType == 'boat':
-                return float('inf'), True  # Avoid moving unless on a boat
-        elif block and block.sectType == 'water':
-            return float('inf'), True  # Avoid moving into water without a boat
+                return 10, False  # Penalize without a boat
+            return float('inf'), True  # Avoid water otherwise
 
         if obs.obstacleType == 'tree':
             if self.collision(obs, x, y):
                 return float('inf'), True  # Completely avoid trees
+
         if obs.obstacleType in ['car', 'train']:
-            if obs.collisionSoon((x, y), 3):  # Immediate collision
-                return float('inf'), True
-            elif obs.collisionSoon((x, y), 5):  # Near collision
+            if obs.collisionSoon((x, y), 3):
+                return float('inf'), True  # Immediate collision
+            if obs.collisionSoon((x, y), 5):
                 return 5, False  # Penalize but allow
-        return 1, False  # Default: no collision, normal weight
+        return 1, False  # Default: no collision
+
 
     def possibleMoves(self, x, y, terrain):
         neighbors = []
@@ -96,53 +98,132 @@ class AIplayer(basePlayer):
                         neighbors.append((newX, newY, totalWeight))
         return neighbors
 
-    def aStar(self, terrain):
-        print("Starting A* algorithm")
-        start = (self.x, self.y)
-        finish = (self.eX, self.eY)
+    # #works
+    # def aStar(self, terrain):
+    #     print("Starting A* algorithm")
+    #     start = (self.x, self.y)
+    #     finish = (self.eX, self.eY)
 
+    #     openList = []
+    #     heapq.heappush(openList, (0, start))  # Priority queue with f-value
+    #     prevSteps = {}
+    #     gCounts = {start: 0}  # Cost from start to the current node
+    #     fCounts = {start: self.calcH(self.x, self.y)}  # Estimated cost from start to finish
+
+    #     while openList:
+    #         priority, current = heapq.heappop(openList)  # Get the node with the smallest f-value
+    #         print(f"Processing node: {current} with priority {priority}")
+
+    #         if current == finish:
+    #             print("Path to finish found!")
+    #             self.path = []
+    #             while current in prevSteps:
+    #                 self.path.append(current)
+    #                 current = prevSteps[current]
+    #             self.path.reverse()
+    #             print(f"Reconstructed path: {self.path}")
+    #             return  # Exit once the path is reconstructed
+
+    #         currX, currY = current
+    #         currG = gCounts[current]
+
+    #         neighbors = self.possibleMoves(currX, currY, terrain)
+    #         print(f"Neighbors for ({currX}, {currY}): {neighbors}")
+
+    #         for newX, newY, weight in neighbors:
+    #             if weight == float('inf'):  # Skip impassable nodes
+    #                 continue
+    #             neighbor = (newX, newY)
+    #             newG = currG + weight
+    #             if neighbor not in gCounts or newG < gCounts[neighbor]:
+    #                 prevSteps[neighbor] = current
+    #                 gCounts[neighbor] = newG
+    #                 fCounts[neighbor] = newG + self.calcH(newX, newY)
+    #                 heapq.heappush(openList, (fCounts[neighbor], neighbor))
+    #                 print(f"Added {neighbor} to openList with f-value {fCounts[neighbor]}")
+
+    def aStar(self, terrain):
         openList = []
-        heapq.heappush(openList, (0, start))  # Priority queue with f-value
+        closedSet = set()
+        heapq.heappush(openList, (0, (self.x, self.y)))  # Priority queue with (f-value, position)
         prevSteps = {}
-        gCounts = {start: 0}  # Cost from start to the current node
-        fCounts = {start: self.calcH(self.x, self.y)}  # Estimated cost from start to finish
+        gCounts = {(self.x, self.y): 0}  # Cost from start
+        fCounts = {(self.x, self.y): self.calcH(self.x, self.y)}  # Total estimated cost
 
         while openList:
-            priority, current = heapq.heappop(openList)  # Get the node with the smallest f-value
-            print(f"Processing node: {current} with priority {priority}")
+            _, current = heapq.heappop(openList)
 
-            if current == finish:
-                print("Path to finish found!")
+            if current in closedSet:
+                continue  # Skip already processed nodes
+
+            if current == (self.eX, self.eY):  # Reached destination
                 self.path = []
                 while current in prevSteps:
                     self.path.append(current)
                     current = prevSteps[current]
                 self.path.reverse()
-                print(f"Reconstructed path: {self.path}")
-                return  # Exit once the path is reconstructed
+                return
 
+            closedSet.add(current)  # Mark node as processed
             currX, currY = current
-            currG = gCounts[current]
 
             neighbors = self.possibleMoves(currX, currY, terrain)
-            print(f"Neighbors for ({currX}, {currY}): {neighbors}")
-
             for newX, newY, weight in neighbors:
-                if weight == float('inf'):  # Skip impassable nodes
-                    continue
+                if weight == float('inf'):
+                    continue  # Skip impassable nodes
+
                 neighbor = (newX, newY)
-                newG = currG + weight
+                newG = gCounts[current] + weight
+
                 if neighbor not in gCounts or newG < gCounts[neighbor]:
                     prevSteps[neighbor] = current
                     gCounts[neighbor] = newG
                     fCounts[neighbor] = newG + self.calcH(newX, newY)
                     heapq.heappush(openList, (fCounts[neighbor], neighbor))
-                    print(f"Added {neighbor} to openList with f-value {fCounts[neighbor]}")
 
-        print("No path found")
+
+        #print("No path found")
        # self.path = []  # Clear the path if no valid route is found
 
- 
+
+    # def aStar(self, terrain):
+    #     print('using a star')
+    #     start = (self.x, self.y)
+    #     finish = (self.eX, self.eY)
+    #     openList = []
+    #     heapq.heappush(openList, (0, start))
+    #     prevSteps = {}
+    #     gCounts = {start: 0}
+    #     fCounts = {start: self.calcH(self.x, self.y)}
+
+    #     while openList:
+    #         priority, current = heapq.heappop(openList) #get smallest fVal
+    #         if current == finish:
+    #             # reconstruct path
+    #             self.path = []
+    #             while current in prevSteps:
+    #                 self.path.append(current)
+    #                 current = prevSteps[current]
+    #             self.path.reverse()
+    #             return
+            
+    #         print(self.path, "hi hih hi")
+
+    #         currG = gCounts[current]
+    #         currX, currY = current
+    #         neighbors = self.possibleMoves(currX, currY, terrain)
+    #         print("hi at neigbors")
+    #         for newX, newY, weight in neighbors:
+    #             if weight == float('inf'):  #skip possible collisions
+    #                 continue
+    #             neighbor = (newX, newY)
+    #             newG = currG + weight
+    #             if neighbor not in gCounts or newG < gCounts[neighbor]:
+    #                 prevSteps[neighbor] = current
+    #                 gCounts[neighbor] = newG
+    #                 fCounts[neighbor] = newG + self.calcH(newX, newY)
+    #                 heapq.heappush(openList, (fCounts[neighbor], neighbor))
+
     def moveAI(self, terrain):
         currTime = time()
         currBlock = terrain.getAIBlock(self.y)
