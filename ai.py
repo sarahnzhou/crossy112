@@ -96,36 +96,39 @@ class AIplayer(basePlayer):
                         neighbors.append((newX, newY, totalWeight))
         return neighbors
 
-
     def aStar(self, terrain):
-        print('using a star')
+        print("Starting A* algorithm")
         start = (self.x, self.y)
         finish = (self.eX, self.eY)
+
         openList = []
-        heapq.heappush(openList, (0, start))
+        heapq.heappush(openList, (0, start))  # Priority queue with f-value
         prevSteps = {}
-        gCounts = {start: 0}
-        fCounts = {start: self.calcH(self.x, self.y)}
+        gCounts = {start: 0}  # Cost from start to the current node
+        fCounts = {start: self.calcH(self.x, self.y)}  # Estimated cost from start to finish
 
         while openList:
-            priority, current = heapq.heappop(openList) #get smallest fVal
+            priority, current = heapq.heappop(openList)  # Get the node with the smallest f-value
+            print(f"Processing node: {current} with priority {priority}")
+
             if current == finish:
-                # reconstruct path
+                print("Path to finish found!")
                 self.path = []
                 while current in prevSteps:
                     self.path.append(current)
                     current = prevSteps[current]
                 self.path.reverse()
-                return
-            
-            print(self.path, "hi hih hi")
+                print(f"Reconstructed path: {self.path}")
+                return  # Exit once the path is reconstructed
 
-            currG = gCounts[current]
             currX, currY = current
+            currG = gCounts[current]
+
             neighbors = self.possibleMoves(currX, currY, terrain)
-            print("hi at neigbors")
+            print(f"Neighbors for ({currX}, {currY}): {neighbors}")
+
             for newX, newY, weight in neighbors:
-                if weight == float('inf'):  #skip possible collisions
+                if weight == float('inf'):  # Skip impassable nodes
                     continue
                 neighbor = (newX, newY)
                 newG = currG + weight
@@ -134,7 +137,12 @@ class AIplayer(basePlayer):
                     gCounts[neighbor] = newG
                     fCounts[neighbor] = newG + self.calcH(newX, newY)
                     heapq.heappush(openList, (fCounts[neighbor], neighbor))
+                    print(f"Added {neighbor} to openList with f-value {fCounts[neighbor]}")
 
+        print("No path found")
+       # self.path = []  # Clear the path if no valid route is found
+
+ 
     def moveAI(self, terrain):
         currTime = time()
         currBlock = terrain.getAIBlock(self.y)
