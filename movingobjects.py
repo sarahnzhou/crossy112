@@ -38,12 +38,3 @@ class Obstacle:
                 self.obstacleX = -self.width
             elif self.obstacleX < -self.width:
                 self.obstacleX = 800 
-    
-    def collisionSoon(self, nodeCoords, impactTime):
-        nodeX, nodeY = nodeCoords
-        futureObsX = self.obstacleX + impactTime*(self.speed * self.direction)
-        futureObsY = self.obstacleY
-        return (
-            nodeX + 110 > futureObsX and nodeX < futureObsX + self.width and
-            nodeY + 95 > futureObsY and nodeY < futureObsY + self.height
-        )
