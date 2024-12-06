@@ -43,6 +43,7 @@ class AIplayer(basePlayer):
                         neighbors.append((newX, newY, totalWeight))
         return neighbors
 
+    # referenced code here: https://www.alps.academy/a-star-algorithm-python/
     def aStar(self, terrain):
         openList = []
         closedSet = set()
