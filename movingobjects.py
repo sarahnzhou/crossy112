@@ -41,25 +41,20 @@ class Obstacle:
 
     def nearby(self, nodeCoords):
         nodeX, nodeY = nodeCoords
-
-        #maybe incorporate in object direction
         proximity = 50
-        nextLeft = self.obstacleX - proximity
-        nextRight = self.obstacleX + self.width + proximity 
-        nextTop = self.obstacleY - proximity 
-        nextBottom = self.obstacleY + self.height + proximity
 
-        horizNearby = nodeX + 100 > nextLeft and nodeX < nextRight
-        vertNearby = nodeY + 100 > nextTop and nodeY < nextBottom
-
+        return (
+            nodeX + 100 > self.obstacleX - proximity and nodeX < self.obstacleX + self.width + proximity and
+            nodeY + 100 > self.obstacleY - proximity and nodeY < self.obstacleY + self.height + proximity
+        )
         return horizNearby and vertNearby
 
     def impendingCollision(self, nodeCoords):
         nodeX, nodeY = nodeCoords
-        predictObsX = self.obstacleX + self.speed * self.direction
+        predictObsX = self.obstacleX + self.speed #* self.direction
         predictObsY = self.obstacleY 
 
-        horizIntersect = nodeX < predictObsX + self.width and nodeX + 100 > predictObsX
-        vertIntersect = nodeY < predictObsY + self.height and nodeY + 100 > predictObsY
-
-        return horizIntersect and vertIntersect
+        return (
+            nodeX < predictObsX + self.width and nodeX + 100 > predictObsX and
+            nodeY < predictObsY + self.height and nodeY + 100 > predictObsY
+        )

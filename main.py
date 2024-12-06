@@ -50,7 +50,7 @@ def startAIMode(app):
     startY = app.height - 300
     endX = 0.75 * app.width
     endY = 0 # change to somehow be 25 steps length
-    app.ai = AIplayer(startX, startY, endX, endY, app.rightdogLink) # change AI image capabilities
+    app.ai = AIplayer(startX, startY, endX, endY, app.rightdogLink, app.leftdogLink) # change AI image capabilities
 
 def restart(app):
     onAppStart(app)

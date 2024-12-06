@@ -8,17 +8,7 @@ class Player(basePlayer):
         self.playerMoveCount = 0 #terrain faster as more moves made per time frame
         self.speedDecay = 0.1
         self.hasMoved = False
-        # self.x = userX
-        # self.y = userY
-        # self.imageLink = rightimageLink
-        # self.leftimageLink = leftimageLink
-        # self.rightimageLink = rightimageLink
-        # self.width = 110 #size of image
-        # self.height = 95
-        # self.verticalstepSize = 100
-        # self.horizontalStepSize = 50
-        # self.onBoat = False
-    
+   
     def snapToGrid(self, xCoord, gridSize):
         #grid size player step size for now - 50
         return rounded(xCoord/50)*50

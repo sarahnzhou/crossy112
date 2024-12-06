@@ -170,7 +170,7 @@ class randomGenerateTerrain:
     def aiModeUpdateTerr(self, player, ai):
         self.updateTerrain(player, ai)
         # if either player "falls" off visible screen
-        if player.y + player.height > self.screenHeight or ai.sY  + 100 > self.screenHeight:
+        if player.y + player.height > self.screenHeight or ai.y  + 100 > self.screenHeight:
             app.gameOver = True
             print("fell off ai")
             self.terrainStarted = False
@@ -191,7 +191,7 @@ class randomGenerateTerrain:
         # scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01) 
 
         frequencyMultiplier = player.playerMoveCount * 0.01 if not ai else max(player.playerMoveCount * 0.01, 0)
-        proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.sY) / self.blockHeight)
+        proximityMultiplier = max((veryTopY - player.y) / self.blockHeight, 0) if not ai else max((veryTopY - player.y) / self.blockHeight, (veryTopY - ai.y) / self.blockHeight)
         scalingFactor = 1 + frequencyMultiplier + (proximityMultiplier * 0.01)
 
         #currBlock = self.getPlayerBlock(player)
@@ -202,15 +202,15 @@ class randomGenerateTerrain:
         #move player and ai with terrain move
         if ai:
             currBlock = self.getPlayerBlock(player)
-            currAIBlock = self.getAIBlock(ai.sY)
+            currAIBlock = self.getAIBlock(ai.y)
 
             if currBlock:
                 if currBlock.sectY <= player.y < currBlock.sectY + self.blockHeight:
                     player.y += self.terrainMoveSpeed 
 
             if currAIBlock:
-                if currAIBlock.sectY <= ai.sY < currAIBlock.sectY + self.blockHeight:
-                    ai.sY += self.terrainMoveSpeed
+                if currAIBlock.sectY <= ai.y < currAIBlock.sectY + self.blockHeight:
+                    ai.y += self.terrainMoveSpeed
                 
         else:
             currBlock = self.getPlayerBlock(player)
@@ -219,7 +219,7 @@ class randomGenerateTerrain:
                     player.y += self.terrainMoveSpeed
 
         #determine how fast to move terrain
-        closestY = min(player.y, ai.sY) if ai else player.y
+        closestY = min(player.y, ai.y) if ai else player.y
         if closestY < veryTopY + self.blockHeight:
             distanceFromVeryTop = max(veryTopY - closestY, 1)
             self.terrainMoveSpeed += (self.baseTerrainMoveSpeed * scalingFactor)/distanceFromVeryTop
@@ -252,10 +252,10 @@ class randomGenerateTerrain:
             player.handleCollisions(block, self)
 
         if ai:
-            aiBlock = self.getAIBlock(ai.sY)
+            aiBlock = self.getAIBlock(ai.y)
             if aiBlock and aiBlock.sectType == 'water':
                 boats = self.getAIBoats(ai)
-                if not any(ai.collision(boat, ai.sX, ai.sY) for boat in boats):
+                if not any(ai.collision(boat, ai.x, ai.y) for boat in boats):
                     app.gameOver = True
                     self.terrainStarted = False
                     print("ai water")
@@ -289,7 +289,7 @@ class randomGenerateTerrain:
                 bottomBlock = block
 
         # check if player at bottom if so game over        
-        if player.y + player.height > self.screenHeight or (ai and ai.sY + 100 > self.screenHeight):
+        if player.y + player.height > self.screenHeight or (ai and ai.y + 100 > self.screenHeight):
             app.gameOver = True
             self.terrainStarted = False  # Stop further terrain updates
     
@@ -305,7 +305,7 @@ class randomGenerateTerrain:
     def getAIBoats(self, ai):
         boats = []
         for block in self.terrainBlocks:
-            if block.sectY <= ai.sY < block.sectY + block.blockHeight and block.sectType == 'water':
+            if block.sectY <= ai.y < block.sectY + block.blockHeight and block.sectType == 'water':
                 for obs in block.obstacles:
                     if obs.obstacleType == 'boat': 
                         boats.append(obs)
