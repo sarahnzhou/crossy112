@@ -172,7 +172,6 @@ class randomGenerateTerrain:
         # if either player "falls" off visible screen
         if player.y + player.height > self.screenHeight or ai.y  + 100 > self.screenHeight:
             app.gameOver = True
-            print("fell off ai")
             self.terrainStarted = False
     
     def updateTerrain(self, player, ai = None):
@@ -233,14 +232,14 @@ class randomGenerateTerrain:
             block.moveObstacles()
             player.handleCollisions(block, self)
 
-        if ai:
-            aiBlock = self.getAIBlock(ai.y)
-            if aiBlock and aiBlock.sectType == 'water':
-                boats = self.getAIBoats(ai)
-                if not any(ai.collision(boat, ai.x, ai.y) for boat in boats):
-                    app.gameOver = True
-                    self.terrainStarted = False
-                    print("ai water")
+        # if ai:
+        #     aiBlock = self.getAIBlock(ai.y)
+        #     if aiBlock and aiBlock.sectType == 'water':
+        #         boats = self.getAIBoats(ai)
+        #         if not any(ai.collision(boat, ai.x, ai.y) for boat in boats):
+        #             app.gameOver = True
+        #             self.terrainStarted = False
+        #             print("ai water")
 
         playerBlock = self.getPlayerBlock(player)
         if playerBlock:

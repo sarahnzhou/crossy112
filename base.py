@@ -23,9 +23,7 @@ class basePlayer:
     def handleCollisions(self, block, terrain):
         for obs in block.obstacles:
                 if self.collision(obs, self.x, self.y):
-                    print(f"Collision detected with {obs.obstacleType} at ({obs.obstacleX}, {obs.obstacleY})")
                     if obs.obstacleType in ['car', 'train']:
-                        print("Game Over: Hit a car or train.")
                         terrain.terrainStarted = False
                         app.gameOver = True
                         return
